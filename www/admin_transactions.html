@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JuvinalPay HQ | Universal Ledger</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: #f1f5f9; margin: 0; display: flex; min-height: 100vh; }
+        
+        /* LOCKED SIDEBAR */
+        aside.master-sidebar { width: 18rem !important; height: 100vh; position: fixed; left: 0; top: 0; background-color: #020617; border-right: 1px solid #1e293b; display: flex; flex-direction: column; padding: 1.5rem; z-index: 50; }
+        .nav-item { display: flex; align-items: center; gap: 1rem; padding: 0.875rem 1.25rem; font-size: 0.875rem; font-weight: 700; color: #94a3b8; border-radius: 1rem; transition: all 0.2s; text-decoration: none; margin-bottom: 0.25rem; white-space: nowrap; }
+        .nav-item.active { background: #4f46e5; color: #ffffff; box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4); }
+        
+        main.dashboard-container { flex: 1; margin-left: 18rem; padding: 2.5rem; display: flex; flex-direction: column; height: 100vh; }
+        .ledger-scroll { overflow-y: auto; flex: 1; border-radius: 2rem; border: 1px solid #1e293b; background: rgba(15, 23, 42, 0.5); }
+    </style>
+</head>
+<body>
+
+    <aside class="master-sidebar">
+        <div class="mb-10 px-2"><h1 class="text-2xl font-extrabold italic">JuvinalPay<span class="text-indigo-500">.</span></h1></div>
+        <nav class="flex-1">
+            <a href="admin_finance.html" class="nav-item">📊 Financial Command</a>
+            <a href="admin_members.html" class="nav-item">👥 Member Capital</a>
+            <a href="admin_loans.html" class="nav-item">💰 Credit Portfolio</a>
+            <a href="admin_debt_collector.html" class="nav-item">🚨 Collections HQ</a>
+            <a href="admin_transactions.html" class="nav-item active">📜 Universal Ledger</a>
+            <a href="admin_settings.html" class="nav-item">⚙️ Global Rules</a>
+        </nav>
+        <button onclick="handleLogout()" class="nav-item text-rose-500 mt-auto border border-rose-500/20">🚪 Logout Session</button>
+    </aside>
+
+    <main class="dashboard-container">
+        <header class="flex justify-between items-center mb-10">
+            <div>
+                <h2 class="text-3xl font-extrabold tracking-tight">Audit Surveillance</h2>
+                <p class="text-slate-400 text-sm mt-1">Live feed of all institutional financial movements.</p>
+            </div>
+            <button onclick="downloadAuditPDF()" class="bg-white text-slate-900 text-[10px] font-bold px-6 py-3 rounded-xl shadow-lg hover:bg-slate-200 transition-all">EXPORT STATEMENT</button>
+        </header>
+
+        <div class="flex gap-4 mb-6 bg-slate-900/50 p-4 rounded-[24px] border border-slate-800">
+            <input type="text" id="auditSearch" onkeyup="applyFilters()" placeholder="Search Name or Ref Code..." 
+                class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-5 py-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-white font-bold">
+            <select id="typeFilter" onchange="applyFilters()" class="bg-slate-950 border border-slate-800 rounded-xl px-5 py-3 text-sm text-slate-400 font-bold outline-none">
+                <option value="all">ALL TYPES</option>
+                <option value="membership_fee">REGISTRATION</option>
+                <option value="deposit">SAVINGS</option>
+                <option value="loan_disbursement">LOAN PAYOUTS</option>
+            </select>
+        </div>
+
+        <div class="ledger-scroll">
+            <table class="w-full text-left border-collapse">
+                <thead class="sticky top-0 bg-slate-900/95 backdrop-blur-xl border-b border-slate-800 z-10">
+                    <tr>
+                        <th class="p-6 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Timestamp</th>
+                        <th class="p-6 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Entity / Ref</th>
+                        <th class="p-6 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Amount</th>
+                        <th class="p-6 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-right">Memo</th>
+                    </tr>
+                </thead>
+                <tbody id="ledgerContent">
+                    </tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        let auditData = [];
+
+        async function initAudit() {
+            // Fetch transactions AND the member name (joined query)
+            const { data, error } = await window.supabaseClient
+                .from('transactions')
+                .select('*, profiles(full_name)')
+                .order('created_at', { ascending: false });
+
+            if (error) {
+                console.error("Ledger Error:", error.message);
+                return;
+            }
+
+            auditData = data; 
+            renderLedger(data); 
+        }
+
+        function renderLedger(data) {
+            const body = document.getElementById('ledgerContent');
+            if (data.length === 0) {
+                body.innerHTML = '<tr><td colspan="4" class="p-20 text-center text-slate-500 font-bold uppercase tracking-widest">No Transactions Found</td></tr>';
+                return;
+            }
+
+            body.innerHTML = data.map(t => {
+                const isPositive = ['deposit', 'membership_fee', 'loan_repayment'].includes(t.transaction_type);
+                const date = new Date(t.created_at).toLocaleString();
+                
+                return `
+                <tr class="border-b border-slate-900 hover:bg-white/5 transition-all">
+                    <td class="p-6">
+                        <p class="text-[11px] font-bold text-slate-400">${date}</p>
+                    </td>
+                    <td class="p-6">
+                        <p class="text-sm font-bold text-slate-100">${t.profiles?.full_name || 'System'}</p>
+                        <p class="text-[9px] font-mono text-indigo-500 uppercase">${t.mpesa_reference || 'INTERNAL'}</p>
+                    </td>
+                    <td class="p-6">
+                        <span class="text-sm font-extrabold ${isPositive ? 'text-emerald-400' : 'text-rose-400'}">
+                            ${isPositive ? '+' : '-'} KES ${t.amount.toLocaleString()}
+                        </span>
+                    </td>
+                    <td class="p-6 text-right text-[10px] text-slate-500 font-bold uppercase tracking-widest">
+                        ${t.transaction_type.replace('_', ' ')}
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        function applyFilters() {
+            const term = document.getElementById('auditSearch').value.toLowerCase();
+            const type = document.getElementById('typeFilter').value;
+
+            const filtered = auditData.filter(t => {
+                const matchesText = (t.profiles?.full_name?.toLowerCase().includes(term)) || 
+                                    (t.mpesa_reference?.toLowerCase().includes(term));
+                const matchesType = type === 'all' || t.transaction_type === type;
+                return matchesText && matchesType;
+            });
+
+            renderLedger(filtered);
+        }
+
+        async function downloadAuditPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.text("JuvinalPay Institutional Audit", 14, 20);
+            
+            const rows = auditData.map(t => [
+                new Date(t.created_at).toLocaleDateString(),
+                t.profiles?.full_name || 'System',
+                t.mpesa_reference || '---',
+                `KES ${t.amount}`,
+                t.transaction_type
+            ]);
+
+            doc.autoTable({
+                head: [['Date', 'Entity', 'Reference', 'Amount', 'Type']],
+                body: rows,
+                startY: 30,
+                theme: 'grid',
+                styles: { fontSize: 8 }
+            });
+
+            doc.save('JuvinalPay_Audit_Report.pdf');
+        }
+
+        async function handleLogout() {
+            await window.supabaseClient.auth.signOut();
+            window.location.href = "login.html";
+        }
+
+        initAudit();
+    </script>
+</body>
+</html>

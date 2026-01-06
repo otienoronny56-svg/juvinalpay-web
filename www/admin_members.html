@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JuvinalPay HQ | Member Capital</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: #f8fafc; margin: 0; display: flex; min-height: 100vh; overflow-x: hidden; }
+        
+        aside.master-sidebar { width: 18rem !important; height: 100vh; position: fixed; left: 0; top: 0; background-color: #020617; border-right: 1px solid #1e293b; display: flex; flex-direction: column; padding: 1.5rem; z-index: 50; }
+        .nav-item { display: flex; align-items: center; gap: 1rem; padding: 0.875rem 1.25rem; font-size: 0.875rem; font-weight: 700; color: #94a3b8; border-radius: 1rem; transition: all 0.2s; text-decoration: none; margin-bottom: 0.25rem; white-space: nowrap; }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.05); color: #ffffff; }
+        .nav-item.active { background: #4f46e5; color: #ffffff; box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4); }
+        main.dashboard-container { flex: 1; margin-left: 18rem; padding: 2.5rem; }
+    </style>
+</head>
+<body>
+
+    <aside class="master-sidebar">
+        <div class="mb-10 px-2"><h1 class="text-2xl font-extrabold italic">JuvinalPay<span class="text-indigo-500">.</span></h1></div>
+        <nav class="flex-1">
+            <a href="admin_finance.html" class="nav-item">📊 Financial Command</a>
+            <a href="admin_members.html" class="nav-item active">👥 Member Capital</a>
+            <a href="admin_loans.html" class="nav-item">💰 Credit Portfolio</a>
+            <a href="admin_debt_collector.html" class="nav-item">🚨 Collections HQ</a>
+            <a href="admin_transactions.html" class="nav-item">📜 Universal Ledger</a>
+            <a href="admin_settings.html" class="nav-item">⚙️ Global Rules</a>
+        </nav>
+        <button onclick="handleLogout()" class="nav-item text-rose-500 mt-auto border border-rose-500/20">🚪 Logout Session</button>
+    </aside>
+
+    <main class="dashboard-container">
+        <header class="flex justify-between items-center mb-10">
+            <div>
+                <h2 class="text-3xl font-extrabold tracking-tight">Member Directory</h2>
+                <p class="text-slate-400 text-sm mt-1">Institutional surveillance and member activation.</p>
+            </div>
+            <button onclick="loadMembers()" class="bg-indigo-600/10 text-indigo-400 text-[10px] font-bold px-4 py-2 rounded-xl border border-indigo-600/20">FORCE REFRESH</button>
+        </header>
+
+        <div class="bg-slate-900/50 border border-slate-800 rounded-[32px] overflow-hidden shadow-2xl">
+            <table class="w-full text-left">
+                <thead class="bg-slate-900 border-b border-slate-800">
+                    <tr>
+                        <th class="p-6 text-[10px] font-bold text-slate-500 uppercase">Identity</th>
+                        <th class="p-6 text-[10px] font-bold text-slate-500 uppercase">Membership</th>
+                        <th class="p-6 text-[10px] font-bold text-slate-500 uppercase text-right">Intervention</th>
+                    </tr>
+                </thead>
+                <tbody id="membersBody"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <div id="dossierModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center z-[100] p-6">
+        <div class="bg-slate-900 border border-slate-800 rounded-[40px] p-10 w-full max-w-lg shadow-2xl">
+            <h3 class="text-2xl font-bold mb-6 text-indigo-400">Institutional Dossier</h3>
+            <div id="dossierContent" class="space-y-4 text-sm border-t border-slate-800 pt-6"></div>
+            <button onclick="closeDossier()" class="mt-8 w-full py-4 bg-slate-800 text-white rounded-2xl font-bold">Dismiss</button>
+        </div>
+    </div>
+
+    <script>
+        async function loadMembers() {
+            // Using the disabled RLS view to ensure you see everyone
+            const { data, error } = await window.supabaseClient.from('profiles').select('*').order('created_at', { ascending: false });
+
+            if (error) return console.error("Error:", error.message);
+
+            const body = document.getElementById('membersBody');
+            body.innerHTML = data.map(m => `
+                <tr class="border-b border-slate-800/50 hover:bg-white/5 transition-all">
+                    <td class="p-6">
+                        <p class="font-bold text-slate-100">${m.full_name || 'Anonymous'}</p>
+                        <p class="text-[10px] text-slate-500 font-mono">${m.phone_number}</p>
+                    </td>
+                    <td class="p-6">
+                        <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase ${m.membership_status === 'active' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-amber-500/10 text-amber-500'}">
+                            ${m.membership_status?.replace('_', ' ') || 'PENDING'}
+                        </span>
+                    </td>
+                    <td class="p-6 text-right space-x-2">
+                        ${m.membership_status !== 'active' ? 
+                            `<button onclick="approveMember('${m.id}', '${m.full_name}')" class="text-[9px] font-black px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">APPROVE</button>` : ''}
+                        <button onclick="viewDossier('${m.id}')" class="text-[9px] font-black px-4 py-2 border border-slate-700 rounded-lg">DOSSIER</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function approveMember(userId, name) {
+            if(!confirm(`APPROVE MEMBER: Grant institutional access to ${name}?`)) return;
+            
+            // 1. Update Status
+            const { error: profileError } = await window.supabaseClient
+                .from('profiles')
+                .update({ membership_status: 'active' })
+                .eq('id', userId);
+
+            if (profileError) {
+                alert("Approval Failed: " + profileError.message);
+                return;
+            }
+
+            // 2. Add Ledger Entry
+            // We do this manually now so it doesn't crash the approval
+            const { error: ledgerError } = await window.supabaseClient
+                .from('transactions')
+                .insert([{
+                    user_id: userId,
+                    amount: 100.00,
+                    transaction_type: 'membership_fee',
+                    description: 'Institutional Registration Fee',
+                    mpesa_reference: 'REG-' + Math.random().toString(36).substr(2, 9).toUpperCase()
+                }]);
+
+            if (ledgerError) {
+                console.warn("Ledger entry warning:", ledgerError.message);
+                // We don't alert here because the user IS approved, which is the important part
+            }
+
+            alert("SUCCESS: Member Activated.");
+            loadMembers();
+        }
+
+        async function viewDossier(userId) {
+            const { data } = await window.supabaseClient.from('profiles').select('*').eq('id', userId).single();
+            if (data) {
+                document.getElementById('dossierContent').innerHTML = `
+                    <p class="text-slate-500 uppercase text-[10px]">Name: <span class="text-white font-bold ml-2">${data.full_name}</span></p>
+                    <p class="text-slate-500 uppercase text-[10px]">Phone: <span class="text-white font-bold ml-2">${data.phone_number}</span></p>
+                    <p class="text-slate-500 uppercase text-[10px]">ID: <span class="text-white font-bold ml-2">${data.id_number || '---'}</span></p>
+                `;
+                document.getElementById('dossierModal').classList.remove('hidden');
+            }
+        }
+
+        function closeDossier() { document.getElementById('dossierModal').classList.add('hidden'); }
+        async function handleLogout() { await window.supabaseClient.auth.signOut(); window.location.href = "login.html"; }
+
+        loadMembers();
+    </script>
+</body>
+</html>

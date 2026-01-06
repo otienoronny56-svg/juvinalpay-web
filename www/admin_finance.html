@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JuvinalPay HQ | Financial Command</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> <script src="supabase-config.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: #f8fafc; margin: 0; display: flex; min-height: 100vh; overflow-x: hidden; }
+        
+        aside.master-sidebar { width: 18rem !important; height: 100vh; position: fixed; left: 0; top: 0; background-color: #020617; border-right: 1px solid #1e293b; display: flex; flex-direction: column; padding: 1.5rem; z-index: 50; }
+        .nav-item { display: flex; align-items: center; gap: 1rem; padding: 0.875rem 1.25rem; font-size: 0.875rem; font-weight: 700; color: #94a3b8; border-radius: 1rem; transition: all 0.2s; text-decoration: none; margin-bottom: 0.25rem; white-space: nowrap; }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.05); color: #ffffff; }
+        .nav-item.active { background: #4f46e5; color: #ffffff; box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4); }
+        main.dashboard-container { flex: 1; margin-left: 18rem; padding: 2.5rem; }
+        
+        .stat-card { background: #1e293b; border: 1px solid #334155; border-radius: 24px; padding: 24px; position: relative; }
+        .loader-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+    </style>
+</head>
+<body>
+
+    <aside class="master-sidebar">
+        <div class="mb-10 px-2"><h1 class="text-2xl font-extrabold italic">JuvinalPay<span class="text-indigo-500">.</span></h1></div>
+        <nav class="flex-1">
+            <a href="admin_finance.html" class="nav-item active">📊 Financial Command</a>
+            <a href="admin_members.html" class="nav-item">👥 Member Capital</a>
+            <a href="admin_loans.html" class="nav-item">💰 Credit Portfolio</a>
+            <a href="admin_debt_collector.html" class="nav-item">🚨 Collections HQ</a>
+            <a href="admin_transactions.html" class="nav-item">📜 Universal Ledger</a>
+            <a href="admin_settings.html" class="nav-item">⚙️ Global Rules</a>
+        </nav>
+        <button onclick="handleLogout()" class="nav-item text-rose-500 mt-auto border border-rose-500/20">🚪 Logout Session</button>
+    </aside>
+
+    <main class="dashboard-container">
+        <header class="mb-10 flex justify-between items-end">
+            <div>
+                <h2 class="text-3xl font-extrabold tracking-tight">Financial Intelligence</h2>
+                <p class="text-slate-400 text-sm mt-1">Live Profit & Liquidity Analysis.</p>
+            </div>
+            <button onclick="loadFinancials()" class="text-xs font-bold text-indigo-400 bg-indigo-500/10 px-4 py-2 rounded-xl hover:bg-indigo-500/20 transition-all">REFRESH DATA</button>
+        </header>
+
+        <div class="grid grid-cols-4 gap-6 mb-10">
+            <div class="stat-card border-l-4 border-l-blue-500">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Loans Given</p>
+                <h3 id="totalGiven" class="text-2xl font-extrabold text-white">...</h3>
+                <p class="text-[10px] text-slate-500 mt-2 font-bold">Lifetime Disbursement</p>
+            </div>
+
+            <div class="stat-card border-l-4 border-l-emerald-500">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Total Repaid</p>
+                <h3 id="totalRepaid" class="text-2xl font-extrabold text-white">...</h3>
+                <p class="text-[10px] text-emerald-500 mt-2 font-bold">Cash Recovered</p>
+            </div>
+
+            <div class="stat-card bg-indigo-900/20 border-indigo-500/50">
+                <p class="text-[10px] font-bold text-indigo-300 uppercase tracking-widest mb-1">Net Profit Realized</p>
+                <h3 id="netProfit" class="text-3xl font-extrabold text-indigo-400">...</h3>
+                <p class="text-[10px] text-indigo-300/60 mt-2 font-bold">Interest Earned (10%)</p>
+            </div>
+
+            <div class="stat-card border-l-4 border-l-purple-500">
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Cash in Safe</p>
+                <h3 id="liquidity" class="text-2xl font-extrabold text-white">...</h3>
+                <p class="text-[10px] text-purple-400 mt-2 font-bold">Available to Lend</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-6">
+            <div class="col-span-2 bg-slate-900 border border-slate-800 rounded-[32px] p-8">
+                <h4 class="font-bold text-slate-200 mb-6">Profit Growth Trajectory</h4>
+                <div class="h-64 w-full">
+                    <canvas id="profitChart"></canvas>
+                </div>
+            </div>
+
+            <div class="bg-slate-900 border border-slate-800 rounded-[32px] p-8">
+                <h4 class="font-bold text-slate-200 mb-6">Capital Breakdown</h4>
+                <div class="space-y-6">
+                    <div>
+                        <div class="flex justify-between text-xs font-bold text-slate-400 mb-2">
+                            <span>Member Savings</span>
+                            <span id="labelSavings" class="text-white">...</span>
+                        </div>
+                        <div class="w-full bg-slate-800 rounded-full h-2">
+                            <div id="barSavings" class="bg-emerald-500 h-2 rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs font-bold text-slate-400 mb-2">
+                            <span>Outstanding Loans</span>
+                            <span id="labelOutstanding" class="text-white">...</span>
+                        </div>
+                        <div class="w-full bg-slate-800 rounded-full h-2">
+                            <div id="barOutstanding" class="bg-rose-500 h-2 rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-xs font-bold text-slate-400 mb-2">
+                            <span>Share Capital</span>
+                            <span id="labelShares" class="text-white">...</span>
+                        </div>
+                        <div class="w-full bg-slate-800 rounded-full h-2">
+                            <div id="barShares" class="bg-purple-500 h-2 rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let chartInstance = null;
+
+        async function loadFinancials() {
+            // 1. Fetch TOTAL Loan History (Cleared + Active)
+            const { data: allLoans, error: lError } = await window.supabaseClient
+                .from('sacco_loans')
+                .select('amount, total_repayment, amount_repaid, loan_status, created_at');
+
+            // 2. Fetch Member Deposits
+            const { data: profiles, error: pError } = await window.supabaseClient
+                .from('profiles')
+                .select('savings_balance, share_capital');
+
+            if (lError || pError) return console.error(lError || pError);
+
+            // --- CALCULATIONS ---
+            
+            // A. Loan Metrics
+            let lifetimeGiven = 0;
+            let lifetimeRepaid = 0;
+            let currentOutstandingPrincipal = 0;
+
+            allLoans.forEach(loan => {
+                lifetimeGiven += loan.amount || 0;     // Total money ever given out
+                lifetimeRepaid += loan.amount_repaid || 0; // Total money ever collected
+                
+                // If loan is active, the money is "Outside" the safe
+                if (loan.loan_status === 'active' || loan.loan_status === 'overdue') {
+                    // Estimate remaining principal (Simplification: Principal is paid last in this logic, or proportional)
+                    // Better logic: Total Due - Repaid = Outstanding. 
+                    // But for Liquidity, we need to know how much PRINCIPAL is gone.
+                    // Let's assume Principal is (Amount).
+                    // If fully paid, Principal is back.
+                    // If partially paid, we assume Principal is still out until cleared. (Conservative view)
+                    currentOutstandingPrincipal += loan.amount;
+                }
+            });
+
+            // B. Profit Calculation (The "Real Money" Logic)
+            // Profit is NOT just (Repaid - Principal). 
+            // We treat every repaid shilling as containing a fraction of profit.
+            // Formula: Profit = TotalRepaid * (InterestRate / (1 + InterestRate))
+            // Rate is 10% (0.10). So Profit = Repaid * (0.10 / 1.10) => Repaid * 0.0909
+            const profit = lifetimeRepaid * (0.10 / 1.10);
+
+            // C. Liquidity (Money in Safe)
+            let totalMemberSavings = 0;
+            let totalShareCapital = 0;
+            profiles.forEach(p => {
+                totalMemberSavings += p.savings_balance || 0;
+                totalShareCapital += p.share_capital || 0;
+            });
+
+            // Liquidity = (Money Members gave us) - (Money we gave out) + (Money we earned/collected)
+            // Actually simpler: Liquidity = (Total Deposits) - (Outstanding Principal)
+            // Wait, if I deposited 1000, and you lent 1000, Safe has 0.
+            // If borrower pays back 1100, Safe has 1100. (1000 deposit liability + 100 profit).
+            // So: Liquidity = (Total Savings + Shares + Profit) - (Outstanding Principal)??
+            // Let's use the standard "Cash at Hand" proxy:
+            // Cash = (Total Savings + Total Shares) - CurrentOutstandingPrincipal + RealizedProfit
+            const cashInSafe = (totalMemberSavings + totalShareCapital) - currentOutstandingPrincipal + profit;
+
+
+            // --- UPDATE UI ---
+            document.getElementById('totalGiven').innerText = `KES ${lifetimeGiven.toLocaleString()}`;
+            document.getElementById('totalRepaid').innerText = `KES ${lifetimeRepaid.toLocaleString()}`;
+            document.getElementById('netProfit').innerText = `KES ${profit.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
+            document.getElementById('liquidity').innerText = `KES ${cashInSafe.toLocaleString(undefined, {maximumFractionDigits: 0})}`;
+
+            document.getElementById('labelSavings').innerText = `KES ${totalMemberSavings.toLocaleString()}`;
+            document.getElementById('labelOutstanding').innerText = `KES ${currentOutstandingPrincipal.toLocaleString()}`;
+            document.getElementById('labelShares').innerText = `KES ${totalShareCapital.toLocaleString()}`;
+
+            // Update Bars
+            const totalVolume = totalMemberSavings + currentOutstandingPrincipal + totalShareCapital; 
+            document.getElementById('barSavings').style.width = `${(totalMemberSavings/totalVolume)*100}%`;
+            document.getElementById('barOutstanding').style.width = `${(currentOutstandingPrincipal/totalVolume)*100}%`;
+            document.getElementById('barShares').style.width = `${(totalShareCapital/totalVolume)*100}%`;
+
+            renderChart(allLoans);
+        }
+
+        function renderChart(loans) {
+            const ctx = document.getElementById('profitChart').getContext('2d');
+            
+            // Group repayments by Date to show trend
+            // Since we don't have a separate 'repayments' table with dates, we will use 'created_at' of loans 
+            // as a proxy for *activity* or if you have a 'transactions' table, that's better.
+            // For now, let's visualize "Projected Profit" based on Loan Creation Dates
+            
+            // 1. Sort loans by date
+            loans.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+
+            const labels = loans.map(l => new Date(l.created_at).toLocaleDateString());
+            // Cumulative Profit Accumulation
+            let cumProfit = 0;
+            const dataPoints = loans.map(l => {
+                // If repaid > 0, we calculate the profit portion of that repayment
+                const p = (l.amount_repaid || 0) * 0.0909; 
+                cumProfit += p;
+                return cumProfit;
+            });
+
+            if(chartInstance) chartInstance.destroy();
+
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Cumulative Profit (KES)',
+                        data: dataPoints,
+                        borderColor: '#818cf8', // Indigo
+                        backgroundColor: 'rgba(129, 140, 248, 0.1)',
+                        borderWidth: 3,
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { display: false },
+                        y: { 
+                            grid: { color: '#334155' },
+                            ticks: { color: '#94a3b8' }
+                        }
+                    }
+                }
+            });
+        }
+
+        async function handleLogout() {
+            await window.supabaseClient.auth.signOut();
+            window.location.href = "login.html";
+        }
+
+        loadFinancials();
+    </script>
+
+    <script type="module">
+        import { App } from '@capacitor/app';
+
+        App.addListener('backButton', ({ canGoBack }) => {
+            if (canGoBack) {
+                window.history.back();
+            } else {
+                App.exitApp();
+            }
+        });
+    </script>
+</body>
+</html>

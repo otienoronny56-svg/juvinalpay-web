@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JuvinalPay HQ | Global Rules</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: #f8fafc; margin: 0; display: flex; min-height: 100vh; }
+        
+        aside.master-sidebar { width: 18rem; height: 100vh; position: fixed; left: 0; top: 0; background-color: #020617; border-right: 1px solid #1e293b; display: flex; flex-direction: column; padding: 1.5rem; z-index: 50; }
+        .nav-item { display: flex; align-items: center; gap: 1rem; padding: 0.875rem 1.25rem; font-size: 0.875rem; font-weight: 700; color: #94a3b8; border-radius: 1rem; transition: all 0.2s; text-decoration: none; margin-bottom: 0.25rem; white-space: nowrap; }
+        .nav-item.active { background: #4f46e5; color: #ffffff; box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4); }
+        
+        main.dashboard-container { flex: 1; margin-left: 18rem; padding: 2.5rem; max-width: 5xl; }
+        
+        /* FIXED VISIBILITY INPUTS */
+        .config-input { 
+            background-color: #0f172a !important; 
+            border: 1px solid #1e293b !important; 
+            color: #ffffff !important; 
+            border-radius: 1rem; 
+            padding: 1rem; 
+            font-size: 0.875rem; 
+            outline: none; 
+            width: 100%; 
+            font-weight: 800;
+        }
+        .config-input:focus { border-color: #4f46e5; ring: 2px solid #4f46e5; }
+        .config-label { @apply text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-3 block ml-1; }
+    </style>
+</head>
+<body>
+
+    <aside class="master-sidebar">
+        <div class="mb-10 px-2">
+            <h1 class="text-2xl font-extrabold italic">JuvinalPay<span class="text-indigo-500">.</span></h1>
+            <p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold mt-1">Admin Command v2.0</p>
+        </div>
+        <nav class="flex-1">
+            <a href="admin_finance.html" class="nav-item">📊 Financial Command</a>
+            <a href="admin_members.html" class="nav-item">👥 Member Capital</a>
+            <a href="admin_loans.html" class="nav-item">💰 Credit Portfolio</a>
+            <a href="admin_debt_collector.html" class="nav-item">🚨 Collections HQ</a>
+            <a href="admin_transactions.html" class="nav-item">📜 Universal Ledger</a>
+            <a href="admin_settings.html" class="nav-item active">⚙️ Global Rules</a>
+        </nav>
+        <button onclick="handleLogout()" class="nav-item text-rose-500 mt-auto border border-rose-500/20">🚪 Logout Session</button>
+    </aside>
+
+    <main class="dashboard-container mx-auto">
+        <header class="mb-12">
+            <h2 class="text-3xl font-extrabold tracking-tight">Business Rule Configuration</h2>
+            <p class="text-slate-400 text-sm mt-1">Adjust the global parameters governing JuvinalPay's financial engine.</p>
+        </header>
+
+        <div class="space-y-10 bg-slate-900/50 p-10 rounded-[40px] border border-slate-800 shadow-2xl">
+            <div>
+                <h3 class="text-indigo-400 font-black text-xs uppercase tracking-widest mb-6 flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 bg-indigo-400 rounded-full"></span> Revenue Streams
+                </h3>
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <label class="config-label">Registration Fee (KES)</label>
+                        <input type="number" id="regFee" class="config-input" placeholder="0.00">
+                    </div>
+                    <div>
+                        <label class="config-label">Withdrawal Fee (KES)</label>
+                        <input type="number" id="transFee" class="config-input" placeholder="0.00">
+                    </div>
+                </div>
+            </div>
+
+            <hr class="border-slate-800">
+
+            <div>
+                <h3 class="text-emerald-400 font-black text-xs uppercase tracking-widest mb-6 flex items-center gap-2">
+                    <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full"></span> Credit Policy
+                </h3>
+                <div class="grid grid-cols-2 gap-6">
+                    <div>
+                        <label class="config-label">Loan Interest (%)</label>
+                        <input type="number" id="interestRate" class="config-input" placeholder="0">
+                    </div>
+                    <div>
+                        <label class="config-label">Weekly Penalty (KES)</label>
+                        <input type="number" id="penaltyAmt" class="config-input" placeholder="0.00">
+                    </div>
+                </div>
+            </div>
+
+            <button onclick="updateConfigs()" id="saveBtn" class="w-full py-5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-[24px] font-black tracking-widest shadow-xl shadow-indigo-600/20 transition-all active:scale-95">
+                UPDATE SACCO RULES
+            </button>
+        </div>
+    </main>
+
+    <script>
+        async function loadConfigs() {
+            const { data, error } = await window.supabaseClient.from('sacco_configs').select('*').eq('id', 1).single();
+            if (!error && data) {
+                document.getElementById('regFee').value = data.membership_fee;
+                document.getElementById('transFee').value = data.transaction_fee;
+                document.getElementById('interestRate').value = data.loan_interest_rate;
+                document.getElementById('penaltyAmt').value = data.weekly_penalty_amount;
+            }
+        }
+
+        async function updateConfigs() {
+            const btn = document.getElementById('saveBtn');
+            btn.disabled = true;
+            btn.innerText = "UPDATING ENGINE...";
+
+            const updates = {
+                membership_fee: document.getElementById('regFee').value,
+                transaction_fee: document.getElementById('transFee').value,
+                loan_interest_rate: document.getElementById('interestRate').value,
+                weekly_penalty_amount: document.getElementById('penaltyAmt').value,
+                updated_at: new Date()
+            };
+
+            const { error } = await window.supabaseClient.from('sacco_configs').update(updates).eq('id', 1);
+            
+            if (!error) {
+                alert("Institutional Rules Updated Successfully!");
+            } else {
+                alert("Update Failed: " + error.message);
+            }
+            
+            btn.disabled = false;
+            btn.innerText = "UPDATE SACCO RULES";
+        }
+
+        async function handleLogout() {
+            await window.supabaseClient.auth.signOut();
+            window.location.href = "login.html";
+        }
+
+        loadConfigs();
+    </script>
+</body>
+</html>

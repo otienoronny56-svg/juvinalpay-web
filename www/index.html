@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JuvinalPay - Save. Borrow. Grow.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .hero-bg { background: linear-gradient(135deg, #4f46e5 0%, #1e1b4b 100%); }
+        .glass-card { background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+    </style>
+</head>
+<body class="bg-gray-50 flex flex-col min-h-screen">
+
+    <nav class="absolute top-0 w-full p-6 flex justify-between items-center z-10">
+        <h1 class="text-2xl font-bold text-white tracking-tight">JuvinalPay<span class="text-emerald-400">.</span></h1>
+        <a href="login.html" class="text-white font-semibold text-sm hover:text-emerald-300 transition-colors">Log In</a>
+    </nav>
+
+    <header class="hero-bg text-white relative overflow-hidden rounded-b-[48px] shadow-2xl pb-20 pt-32 px-6 text-center lg:text-left lg:flex lg:items-center lg:justify-between lg:px-20">
+        
+        <div class="absolute top-0 right-0 w-96 h-96 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 -translate-y-10 translate-x-10 animate-pulse"></div>
+
+        <div class="relative z-10 max-w-xl mx-auto lg:mx-0">
+            <span class="px-3 py-1 rounded-full bg-indigo-500/30 border border-indigo-400/30 text-indigo-200 text-xs font-bold uppercase tracking-widest mb-4 inline-block">The Modern SACCO</span>
+            <h1 class="text-5xl lg:text-6xl font-extrabold mb-6 leading-tight">
+                Financial Freedom for <span class="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-cyan-400">Everyone.</span>
+            </h1>
+            <p class="text-indigo-100 text-lg mb-8 leading-relaxed">
+                Save smartly, borrow instantly, and earn dividends. Join the digital cooperative that puts your future first.
+            </p>
+            
+            <div class="flex flex-col gap-4 sm:flex-row sm:justify-center lg:justify-start">
+                <a href="register.html" class="px-8 py-4 bg-emerald-500 hover:bg-emerald-600 text-white font-bold rounded-2xl shadow-lg shadow-emerald-500/30 transition-all active:scale-95 flex items-center justify-center gap-2">
+                    Join Now
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                </a>
+                <a href="login.html" class="px-8 py-4 bg-white/10 hover:bg-white/20 text-white font-bold rounded-2xl border border-white/10 backdrop-blur-sm transition-all flex items-center justify-center">
+                    Member Login
+                </a>
+            </div>
+        </div>
+
+        <div class="hidden lg:block relative z-10 mt-10 lg:mt-0">
+            <div class="glass-card p-6 rounded-3xl w-80 rotate-3 transform hover:rotate-0 transition-all duration-500">
+                <div class="flex justify-between items-center mb-6">
+                    <div class="h-10 w-10 bg-emerald-500 rounded-full flex items-center justify-center text-white font-bold">JP</div>
+                    <span class="text-xs font-bold text-emerald-300">+ KES 15,000</span>
+                </div>
+                <div class="space-y-3">
+                    <div class="h-2 w-20 bg-white/20 rounded-full"></div>
+                    <div class="h-2 w-full bg-white/10 rounded-full"></div>
+                    <div class="h-2 w-40 bg-white/10 rounded-full"></div>
+                </div>
+                <div class="mt-6 pt-4 border-t border-white/10 flex justify-between">
+                    <span class="text-[10px] text-indigo-200">Total Savings</span>
+                    <span class="text-sm font-bold text-white">KES 124,500</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="px-6 py-16 max-w-6xl mx-auto w-full">
+        <div class="text-center mb-12">
+            <h2 class="text-2xl font-bold text-gray-800">Why choose JuvinalPay?</h2>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+            <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all">
+                <div class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center mb-6 text-2xl">💰</div>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">High-Yield Savings</h3>
+                <p class="text-sm text-gray-500">Lock your funds and earn up to 8% p.a. interest. Your money grows while you sleep.</p>
+            </div>
+
+            <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all">
+                <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center mb-6 text-2xl">⚡</div>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Instant Loans</h3>
+                <p class="text-sm text-gray-500">Borrow up to 3x your savings instantly. No paperwork, just a simple click.</p>
+            </div>
+
+            <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all">
+                <div class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center mb-6 text-2xl">🛡️</div>
+                <h3 class="text-lg font-bold text-gray-800 mb-2">Secure & Transparent</h3>
+                <p class="text-sm text-gray-500">Bank-grade security with real-time transaction tracking and PDF statements.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="mt-auto bg-white border-t border-gray-100 py-8 text-center">
+        <p class="text-sm text-gray-400">© 2024 JuvinalPay SACCO. All rights reserved.</p>
+        <div class="flex justify-center gap-4 mt-4">
+            <a href="#" class="text-xs text-indigo-600 font-bold">Privacy Policy</a>
+            <a href="admin_finance.html" class="text-xs text-indigo-600 font-bold">Admin Portal</a>
+        </div>
+    </footer>
+
+    <script>
+        // Auto-Redirect Logic: If user is already logged in, skip this page
+        async function checkSession() {
+            const { data: { session } } = await window.supabaseClient.auth.getSession();
+            if (session) {
+                // Check if admin or user (optional refinement, mostly redirect to dashboard)
+                window.location.href = "dashboard.html";
+            }
+        }
+        checkSession();
+    </script>
+</body>
+</html>

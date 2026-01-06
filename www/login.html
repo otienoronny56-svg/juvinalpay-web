@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JuvinalPay | Secure Access</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+        .login-card { @apply w-full max-w-md bg-white rounded-[40px] shadow-2xl p-10 border border-slate-100; }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-6 bg-slate-50">
+
+    <div class="login-card">
+        <div class="text-center mb-10">
+            <h1 class="text-3xl font-extrabold italic tracking-tight text-slate-900">JuvinalPay<span class="text-indigo-600">.</span></h1>
+            <p class="text-slate-400 text-sm mt-2 font-medium">Institutional Login Portal</p>
+        </div>
+
+        <div class="space-y-5">
+            <div>
+                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1 block mb-2">Institutional ID (Email)</label>
+                <input type="email" id="email" placeholder="name@domain.com" 
+                    class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm font-semibold">
+            </div>
+
+            <div>
+                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1 block mb-2">Access Key (Password)</label>
+                <input type="password" id="password" placeholder="••••••••" 
+                    class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm font-semibold">
+            </div>
+
+            <button onclick="handleLogin()" id="loginBtn"
+                class="w-full bg-slate-900 hover:bg-black text-white font-bold py-5 rounded-[24px] shadow-xl active:scale-95 transition-all mt-4">
+                Verify & Enter
+            </button>
+        </div>
+
+        <p class="text-center text-xs text-slate-400 mt-10 font-medium">
+            New to the cooperative? <a href="register.html" class="text-indigo-600 font-bold hover:underline">Apply for Membership</a>
+        </p>
+    </div>
+
+    <script>
+        // 1. Session Guard: Auto-redirect if already logged in
+        async function checkSession() {
+            if (!window.supabaseClient) return;
+            const { data: { session } } = await window.supabaseClient.auth.getSession();
+            if (session) {
+                console.log("Session found, initiating redirect logic...");
+                redirectBasedOnRole(session.user.id);
+            }
+        }
+
+        // 2. High-Intelligence Redirect Logic
+        async function redirectBasedOnRole(userId) {
+            console.log("Fetching profile for ID:", userId);
+
+            // Use maybeSingle to prevent 406 errors if row is missing
+            const { data: profile, error } = await window.supabaseClient
+                .from('profiles')
+                .select('role, membership_status')
+                .eq('id', userId)
+                .maybeSingle(); 
+
+            if (error) {
+                console.error("Database Fetch Error:", error);
+                alert("System Error: Unable to verify account profile. Please refresh.");
+                return;
+            }
+
+            if (!profile) {
+                console.error("Profile record missing for Auth User.");
+                alert("Account error: Your profile record was not found. Contact Admin.");
+                return;
+            }
+
+            console.log("Profile Found. Role:", profile.role, "Status:", profile.membership_status);
+
+            // Redirect Logic based on role and status
+            if (profile.role === 'admin') {
+                window.location.href = "admin_finance.html";
+            } 
+            else if (profile.membership_status === 'pending_payment') {
+                window.location.href = "payment.html"; // Send to membership payment page
+            } 
+            else {
+                window.location.href = "dashboard.html"; // Standard Member Home
+            }
+        }
+
+        // 3. Login Handler
+        async function handleLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('loginBtn');
+
+            if (!email || !password) {
+                alert("Credentials required.");
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "Authenticating...";
+
+            const { data, error } = await window.supabaseClient.auth.signInWithPassword({
+                email: email,
+                password: password
+            });
+
+            if (error) {
+                console.error("Login Error:", error.message);
+                alert("Login Failed: " + error.message);
+                btn.disabled = false;
+                btn.innerText = "Verify & Enter";
+            } else {
+                console.log("Auth Success. Checking role...");
+                redirectBasedOnRole(data.user.id);
+            }
+        }
+
+        checkSession();
+    </script>
+</body>
+</html>

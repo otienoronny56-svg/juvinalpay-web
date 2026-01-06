@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JuvinalPay | Member Application</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; }
+        .gradient-brand { background: linear-gradient(135deg, #4f46e5 0%, #1e1b4b 100%); }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen flex flex-col">
+
+    <div class="gradient-brand p-12 text-white text-center rounded-b-[60px] shadow-2xl">
+        <h1 class="text-4xl font-extrabold italic tracking-tighter text-white">JuvinalPay<span class="text-emerald-400">.</span></h1>
+        <p class="mt-2 text-indigo-200 font-medium text-sm uppercase tracking-widest">Digital Cooperative Movement</p>
+    </div>
+
+    <main class="flex-grow flex items-center justify-center p-6 -mt-16">
+        <div class="w-full max-w-xl bg-white rounded-[40px] shadow-2xl p-10 border border-slate-100">
+            <form id="registerForm" class="space-y-6">
+                
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Legal Full Name</label>
+                    <input type="text" id="fullName" required placeholder="As per National ID" 
+                        class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none font-semibold text-sm">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-2 block">National ID Number</label>
+                        <input type="text" id="idNumber" required placeholder="12345678" 
+                            class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none font-semibold text-sm">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-2 block">M-Pesa Number</label>
+                        <input type="tel" id="phone" required placeholder="0712..." 
+                            class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none font-semibold text-sm">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Email Address</label>
+                    <input type="email" id="email" required placeholder="you@example.com" 
+                        class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none font-semibold text-sm">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="password" id="password" required placeholder="Access Key" 
+                        class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none font-semibold text-sm">
+                    <input type="password" id="confirmPassword" required placeholder="Confirm Key" 
+                        class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none font-semibold text-sm">
+                </div>
+
+                <button type="submit" id="submitBtn"
+                    class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-5 rounded-[24px] shadow-xl transition-all active:scale-95 disabled:opacity-50">
+                    Apply for Membership
+                </button>
+
+                <p class="text-center text-xs text-slate-400 font-medium">
+                    Already a member? <a href="login.html" class="text-indigo-600 font-bold hover:underline">Log in here</a>
+                </p>
+            </form>
+        </div>
+    </main>
+
+    <footer class="p-8 text-center text-slate-400 text-[10px] font-bold uppercase tracking-widest">
+        Institutional Trust &copy; 2026 JuvinalPay SACCO
+    </footer>
+
+    <script>
+        const form = document.getElementById('registerForm');
+        const submitBtn = document.getElementById('submitBtn');
+
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            
+            if (!window.supabaseClient) {
+                return alert("System Error: Supabase connection failed. Check your config file.");
+            }
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const confirm = document.getElementById('confirmPassword').value;
+            const fullName = document.getElementById('fullName').value;
+            const phone = document.getElementById('phone').value;
+            const idNumber = document.getElementById('idNumber').value;
+
+            if (password !== confirm) {
+                return alert("Access Keys do not match. Please verify.");
+            }
+
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Processing Application...";
+
+            // Sign Up User and pass metadata for the SQL Trigger
+            const { data, error } = await window.supabaseClient.auth.signUp({
+                email: email,
+                password: password,
+                options: {
+                    data: {
+                        full_name: fullName,
+                        phone_number: phone,
+                        id_number: idNumber
+                    }
+                }
+            });
+
+            if (error) {
+                alert("Error: " + error.message);
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Apply for Membership";
+            } else {
+                console.log("Member Auth Created. Redirecting to Payment...");
+                // Redirect to flat payment page
+                window.location.href = "payment.html"; 
+            }
+        };
+    </script>
+</body>
+</html>

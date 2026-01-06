@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verification Pending | JuvinalPay</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+        .success-loader { border-top-color: #10b981; border-left-color: transparent; animation: spinner 1.5s linear infinite; }
+        @keyframes spinner { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen items-center justify-center p-6 text-center">
+
+    <div class="mb-8 bg-emerald-500/10 p-8 rounded-full border border-emerald-500/20 shadow-inner">
+        <svg class="h-16 w-16 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+        </svg>
+    </div>
+
+    <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Payment Dispatched!</h1>
+    <p class="text-slate-500 mt-4 max-w-xs mx-auto text-sm leading-relaxed">
+        Your registration fee has been logged. Our auditors are verifying the M-Pesa receipt for final clearance.
+    </p>
+
+    <div class="mt-10 bg-white border border-slate-100 rounded-[32px] p-8 shadow-2xl w-full max-w-sm">
+        <div class="flex flex-col items-center gap-4">
+            <div class="success-loader rounded-full border-4 border-slate-50 h-8 w-8"></div>
+            <div>
+                <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Verification Status</p>
+                <h4 id="statusText" class="font-bold text-slate-800 text-lg mt-1 tracking-tight">Awaiting Admin Approval...</h4>
+            </div>
+        </div>
+        
+        <button onclick="checkApprovalStatus()" 
+            class="mt-8 w-full bg-slate-900 text-white font-bold py-5 rounded-2xl shadow-xl active:scale-95 transition-all hover:bg-black">
+            Refresh Clearance Status
+        </button>
+    </div>
+
+    <p class="mt-12 text-[10px] font-bold text-slate-300 uppercase tracking-[0.2em]">Institutional Banking Protocol v2.0</p>
+
+    <script>
+        async function checkApprovalStatus() {
+            // Wait for Supabase engine
+            if (!window.supabaseClient) { setTimeout(checkApprovalStatus, 100); return; }
+
+            const { data: { user } } = await window.supabaseClient.auth.getUser();
+            if (!user) { window.location.href = "login.html"; return; }
+
+            // Pull live profile status
+            const { data: profile, error } = await window.supabaseClient
+                .from('profiles')
+                .select('membership_status')
+                .eq('id', user.id)
+                .single();
+
+            const statusLabel = document.getElementById('statusText');
+
+            if (profile?.membership_status === 'active') {
+                statusLabel.innerText = "ACCESS GRANTED!";
+                statusLabel.className = "text-emerald-500 font-bold text-lg mt-1";
+                
+                alert("Welcome to the cooperative! Your account is now active.");
+                window.location.href = "dashboard.html"; // Flat path
+            } else {
+                statusLabel.innerText = "Still Processing...";
+                console.log("Status remains: " + profile?.membership_status);
+            }
+        }
+
+        // Automatic re-check every 10 seconds
+        setInterval(checkApprovalStatus, 10000);
+        checkApprovalStatus();
+    </script>
+</body>
+</html>

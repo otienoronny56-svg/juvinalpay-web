@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JuvinalPay HQ | Collections</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: #f8fafc; margin: 0; display: flex; min-height: 100vh; overflow-x: hidden; }
+        aside.master-sidebar { width: 18rem !important; height: 100vh; position: fixed; left: 0; top: 0; background-color: #020617; border-right: 1px solid #1e293b; display: flex; flex-direction: column; padding: 1.5rem; z-index: 50; }
+        .nav-item { display: flex; align-items: center; gap: 1rem; padding: 0.875rem 1.25rem; font-size: 0.875rem; font-weight: 700; color: #94a3b8; border-radius: 1rem; transition: all 0.2s; text-decoration: none; margin-bottom: 0.25rem; white-space: nowrap; }
+        .nav-item:hover { background: rgba(255, 255, 255, 0.05); color: #ffffff; }
+        .nav-item.active { background: #4f46e5; color: #ffffff; box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4); }
+        main.dashboard-container { flex: 1; margin-left: 18rem; padding: 2.5rem; }
+    </style>
+</head>
+<body>
+
+    <aside class="master-sidebar">
+        <div class="mb-10 px-2"><h1 class="text-2xl font-extrabold italic">JuvinalPay<span class="text-indigo-500">.</span></h1></div>
+        <nav class="flex-1">
+            <a href="admin_finance.html" class="nav-item">📊 Financial Command</a>
+            <a href="admin_members.html" class="nav-item">👥 Member Capital</a>
+            <a href="admin_loans.html" class="nav-item">💰 Credit Portfolio</a>
+            <a href="admin_debt_collector.html" class="nav-item active">🚨 Collections HQ</a>
+            <a href="admin_transactions.html" class="nav-item">📜 Universal Ledger</a>
+            <a href="admin_settings.html" class="nav-item">⚙️ Global Rules</a>
+        </nav>
+        <button onclick="handleLogout()" class="nav-item text-rose-500 mt-auto border border-rose-500/20">🚪 Logout Session</button>
+    </aside>
+
+    <main class="dashboard-container">
+        <header class="flex justify-between items-center mb-10">
+            <div>
+                <h2 class="text-3xl font-extrabold tracking-tight">Collections HQ</h2>
+                <p class="text-slate-400 text-sm mt-1">Live Daraja Integration Active.</p>
+            </div>
+            <button onclick="loadCollections()" class="bg-rose-600/10 text-rose-400 text-[10px] font-bold px-4 py-2 rounded-xl border border-rose-600/20">FORCE REFRESH</button>
+        </header>
+
+        <div class="bg-slate-900/50 border border-slate-800 rounded-[32px] overflow-hidden shadow-2xl">
+            <table class="w-full text-left">
+                <thead class="bg-slate-900 border-b border-slate-800">
+                    <tr>
+                        <th class="p-6 text-[10px] font-bold text-slate-500 uppercase">Debtor</th>
+                        <th class="p-6 text-[10px] font-bold text-slate-500 uppercase">Balance</th>
+                        <th class="p-6 text-[10px] font-bold text-slate-500 uppercase">Status</th>
+                        <th class="p-6 text-[10px] font-bold text-slate-500 uppercase text-right">M-Pesa Action</th>
+                    </tr>
+                </thead>
+                <tbody id="collectionsBody"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <script>
+        async function loadCollections() {
+            const { data, error } = await window.supabaseClient.from('late_loans_analysis').select('*');
+            if (error) return console.error(error.message);
+
+            const body = document.getElementById('collectionsBody');
+            body.innerHTML = data.map(loan => `
+                <tr class="border-b border-slate-800/50 hover:bg-white/5 transition-all">
+                    <td class="p-6">
+                        <p class="font-bold text-slate-100">${loan.full_name}</p>
+                        <p class="text-[10px] text-slate-500 font-mono tracking-wider">${loan.phone_number}</p>
+                    </td>
+                    <td class="p-6">
+                        <p class="text-sm font-extrabold text-white">KES ${loan.outstanding_balance.toLocaleString()}</p>
+                    </td>
+                    <td class="p-6">
+                        <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase bg-slate-800 text-slate-400">
+                           ${loan.days_overdue > 0 ? loan.days_overdue + ' DAYS LATE' : 'CURRENT'}
+                        </span>
+                    </td>
+                    <td class="p-6 text-right">
+                        <button onclick="initiateMpesaPayment('${loan.phone_number}', ${loan.outstanding_balance}, '${loan.full_name}')" 
+                            class="text-[9px] font-black px-6 py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-500 hover:scale-105 transition-all shadow-lg shadow-emerald-900/40 flex items-center gap-2 ml-auto">
+                            <span>📲</span> STK PUSH
+                        </button>
+                    </td>
+                </tr>`).join('');
+        }
+
+        async function initiateMpesaPayment(phone, balance, name) {
+            const amount = prompt(`Trigger M-Pesa Request for ${name} (${phone})\n\nEnter Amount to Deduct:`, Math.ceil(balance));
+            if (!amount) return;
+
+            let cleanPhone = phone.replace(/\D/g, ''); 
+            if (cleanPhone.startsWith('0')) cleanPhone = '254' + cleanPhone.substring(1);
+
+            alert(`Sending M-Pesa Prompt to ${cleanPhone}...`);
+
+            // CALL EXISTING EDGE FUNCTION
+            // We specifically send 'depositType': 'LoanRepayment' to match your mpesa-callback logic
+            const { data, error } = await window.supabaseClient.functions.invoke('stk-push', {
+                body: { 
+                    phone: cleanPhone, 
+                    amount: parseInt(amount), 
+                    depositType: 'LoanRepayment' 
+                }
+            });
+
+            if (error) {
+                alert("STK Push Failed: " + error.message);
+            } else {
+                alert(`✅ SUCCESS: Check ${name}'s phone for the PIN prompt.`);
+                console.log("Safaricom Response:", data);
+            }
+        }
+
+        async function handleLogout() {
+            await window.supabaseClient.auth.signOut();
+            window.location.href = "login.html";
+        }
+
+        loadCollections();
+    </script>
+</body>
+</html>
