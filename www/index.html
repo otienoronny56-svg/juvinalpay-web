@@ -123,7 +123,22 @@
             if (!window.supabaseClient) return;
             const { data: { session } } = await window.supabaseClient.auth.getSession();
             if (session) {
-                window.location.href = "dashboard.html";
+                // Fetch status to decide where to send them
+                const { data: profile } = await window.supabaseClient
+                    .from('profiles')
+                    .select('role, membership_status')
+                    .eq('id', session.user.id)
+                    .single();
+
+                if (profile?.role === 'admin') {
+                    window.location.href = "admin_dashboard.html";
+                } else if (profile?.membership_status === 'active') {
+                    window.location.href = "dashboard.html";
+                } else if (profile?.membership_status === 'pending_approval') {
+                    window.location.href = "success.html";
+                } else {
+                    window.location.href = "payment.html?mode=onboarding";
+                }
             }
         }
         checkSession();

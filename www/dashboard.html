@@ -154,9 +154,34 @@
 
         async function init() {
             if (!window.supabaseClient) return;
+            // 1. Get User
             const { data: { user } } = await window.supabaseClient.auth.getUser();
             if (!user) return window.location.href = 'login.html';
 
+            // 2. THE BOUNCER CHECK (New Security Layer) 🔒
+            // We fetch the profile status before showing anything
+            const { data: profile } = await window.supabaseClient
+                .from('profiles')
+                .select('membership_status')
+                .eq('id', user.id)
+                .single();
+
+            // If they haven't paid -> Send to Payment
+            if (profile.membership_status === 'pending_payment') {
+                return window.location.href = 'payment.html?mode=onboarding';
+            }
+            // If they paid but Admin hasn't approved -> Send to Waiting Room
+            if (profile.membership_status === 'pending_approval') {
+                return window.location.href = 'success.html';
+            }
+            // If they are Banned -> Kick out
+            if (profile.membership_status === 'banned') {
+                await window.supabaseClient.auth.signOut();
+                alert("Account Suspended. Contact Admin.");
+                return window.location.href = 'login.html';
+            }
+
+            // 3. If "active", Allow Entry & Load Data
             await loadProfile(user.id);
             await loadTransactions(user.id);
 
