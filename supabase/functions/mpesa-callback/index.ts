@@ -77,11 +77,24 @@ serve(async (req) => {
                 checkoutId
             });
 
+            // --- DETERMINE TYPE ---
+            let txType = 'deposit';
+            let txDesc = 'M-Pesa Deposit';
+
+            if (intent === 'membership_fee') {
+                txType = 'fee'; // 👈 CRITICAL FIX: Mark as Revenue
+                txDesc = 'Registration Fee';
+            } else if (intent === 'share_capital') {
+                txType = 'share_capital';
+                txDesc = 'Share Capital Investment';
+            }
+
+            // --- SAVE TO LEDGER ---
             const { data: ledgerData, error: ledgerError } = await supabase.from('transactions').insert({
-                user_id: userId, // Make sure you have the userId here
+                user_id: userId,
                 amount: amountPaid,
-                transaction_type: 'deposit',
-                description: 'M-Pesa Deposit',
+                transaction_type: txType, // Uses the correct type now
+                description: txDesc,
                 mpesa_reference: receiptNumber,
                 status: 'completed'
             });
