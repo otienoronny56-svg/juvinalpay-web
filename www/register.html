@@ -1,9 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-            <!-- Font Awesome for modern icons -->
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
-        <link rel="icon" type="image/png" href="logo.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="icon" type="image/png" href="logo.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JuvinalPay | Member Application</title>
@@ -26,7 +25,7 @@
         </header>
     </div>
 
-    <main class="flex-grow flex items-center justify-center p-6 -mt-16">
+    <main class="flex-grow flex items-center justify-center p-6 -mt-16 pb-10">
         <div class="w-full max-w-xl bg-white rounded-[40px] shadow-2xl p-10 border border-slate-100">
             <form id="registerForm" class="space-y-6">
                 
@@ -52,7 +51,7 @@
                             <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 mb-1 block">County</label>
                             <select id="county" onchange="loadSubCounties()" class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm font-bold outline-none text-slate-700">
                                 <option value="" disabled selected>Select County</option>
-                                </select>
+                            </select>
                         </div>
                         <div>
                             <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 mb-1 block">Sub-County</label>
@@ -106,33 +105,7 @@
                 <p class="text-center text-xs text-slate-400 font-medium">Already a member? <a href="login.html" class="text-indigo-600 font-bold hover:underline">Log in</a></p>
             </form>
         </div>
-        </main>
-
-        <nav class="fixed bottom-0 w-full bg-white border-t border-slate-100 pb-4 pt-2 px-6 flex justify-between z-30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
-            <a href="dashboard.html" class="flex flex-col items-center gap-1 p-2 text-slate-400 hover:text-slate-900 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-                    <path d="M11.47 3.84a.75.75 0 011.06 0l8.635 8.635a.75.75 0 11-1.06 1.06l-.375-.375v4.425a.75.75 0 01-.75.75H16.5V13.5a1.5 1.5 0 00-1.5-1.5h-6a1.5 1.5 0 00-1.5 1.5v4.885H4.125a.75.75 0 01-.75-.75V13.16l-.375.375a.75.75 0 11-1.06-1.06L11.47 3.84z" />
-                </svg>
-                <span class="text-[10px] font-bold">Home</span>
-            </a>
-            <a href="loans.html" class="flex flex-col items-center gap-1 p-2 text-slate-400 hover:text-slate-900 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-                    <path fill-rule="evenodd" d="M7.5 6v.75H5.513c-.96 0-1.764.724-1.865 1.679l-1.263 12A1.875 1.875 0 004.25 22.5h15.5a1.875 1.875 0 001.865-2.071l-1.263-12a1.875 1.875 0 00-1.865-1.679H16.5V6a4.5 4.5 0 10-9 0zM12 3a3 3 0 00-3 3v.75h6V6a3 3 0 00-3-3zm-3 8.25a3 3 0 106 0v-.75a.75.75 0 011.5 0v.75a4.5 4.5 0 11-9 0v-.75a.75.75 0 011.5 0v.75z" clip-rule="evenodd" />
-                </svg>
-                <span class="text-[10px] font-bold">Loans</span>
-            </a>
-            <a href="activity.html" class="flex flex-col items-center gap-1 p-2 text-slate-400 hover:text-slate-900 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-                    <path fill-rule="evenodd" d="M12 2.25a9.75 9.75 0 100 19.5 9.75 9.75 0 000-19.5zM12 18a6 6 0 110-12 6 6 0 010 12zm.75-9.75a.75.75 0 00-1.5 0v3.19l2.72 1.63a.75.75 0 10.76-1.29l-2.23-1.34V8.25z" clip-rule="evenodd" />
-                </svg>
-                <span class="text-[10px] font-bold">Activity</span>
-            </a>
-            <a href="profile.html" class="flex flex-col items-center gap-1 p-2 text-slate-400 hover:text-slate-900 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
-                    <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clip-rule="evenodd" />
-                </svg>
-                <span class="text-[10px] font-bold">Profile</span>
-        </nav>
+    </main>
 
     <script>
         // --- KENYA DATA ENGINE ---
@@ -165,7 +138,6 @@
             "Trans Nzoia": ["Kwanza", "Endebess", "Saboti", "Kiminini", "Cherangany"],
             "Uasin Gishu": ["Soy", "Turbo", "Moiben", "Ainabkoi", "Kapseret", "Kesses"],
             "Elgeyo-Marakwet": ["Marakwet East", "Marakwet West", "Keiyo North", "Keiyo South"],
-            </form>
             "Nandi": ["Tinderet", "Aldai", "Nandi Hills", "Chesumei", "Emgwen", "Mosop"],
             "Baringo": ["Tiaty", "Baringo North", "Baringo Central", "Baringo South", "Mogotio", "Eldama Ravine"],
             "Laikipia": ["Laikipia West", "Laikipia East", "Laikipia North"],
@@ -185,63 +157,104 @@
             "Kisii": ["Bonchari", "South Mugirango", "Bomachoge Borabu", "Bobasi", "Bomachoge Chache", "Nyaribari Masaba", "Nyaribari Chache", "Kitutu Chache North", "Kitutu Chache South"],
             "Nyamira": ["Kitutu Masaba", "West Mugirango", "North Mugirango", "Borabu"],
             "Nairobi": ["Westlands", "Dagoretti North", "Dagoretti South", "Langata", "Kibra", "Roysambu", "Kasarani", "Ruaraka", "Embakasi South", "Embakasi North", "Embakasi Central", "Embakasi East", "Embakasi West", "Makadara", "Kamukunji", "Starehe", "Mathare"]
-            </form>
-            input.type = input.type === 'password' ? 'text' : 'password';
+        };
+
+        function initLocation() {
+            const countySelect = document.getElementById('county');
+            Object.keys(kenyaData).sort().forEach(county => {
+                const option = document.createElement('option');
+                option.value = county;
+                option.innerText = county;
+                countySelect.appendChild(option);
+            });
+        }
+
+        function loadSubCounties() {
+            const county = document.getElementById('county').value;
+            const subSelect = document.getElementById('subCounty');
+            subSelect.innerHTML = '<option value="" disabled selected>Select Sub-County</option>';
+            subSelect.disabled = false;
+
+            if (kenyaData[county]) {
+                kenyaData[county].forEach(sub => {
+                    const option = document.createElement('option');
+                    option.value = sub;
+                    option.innerText = sub;
+                    subSelect.appendChild(option);
+                });
+            }
         }
 
         function handleDocType() {
             const type = document.getElementById('docType').value;
-            document.getElementById('docNumberContainer').classList.remove('hidden');
-            document.getElementById('otherDocContainer').classList.toggle('hidden', type !== 'other');
+            const numContainer = document.getElementById('docNumberContainer');
+            const otherContainer = document.getElementById('otherDocContainer');
+
+            if (type === 'other') {
+                otherContainer.classList.remove('hidden');
+                numContainer.classList.remove('hidden');
+            } else if (type) {
+                otherContainer.classList.add('hidden');
+                numContainer.classList.remove('hidden');
+            } else {
+                otherContainer.classList.add('hidden');
+                numContainer.classList.add('hidden');
+            }
         }
 
-        const form = document.getElementById('registerForm');
-        form.onsubmit = async (e) => {
-            e.preventDefault();
-            if (!window.supabaseClient) return alert("Supabase config missing.");
+        function togglePass(id) {
+            const input = document.getElementById(id);
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
 
+        // Handle Registration
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            const confirm = document.getElementById('confirmPassword').value;
-            if (password !== confirm) return alert("Passwords do not match.");
-
-            const fullName = `${document.getElementById('firstName').value} ${document.getElementById('middleName').value} ${document.getElementById('lastName').value}`.replace(/\s+/g, ' ').trim();
-            
-            // Collect Smart Location Data
+            const confirmPass = document.getElementById('confirmPassword').value;
+            const firstName = document.getElementById('firstName').value;
+            const middleName = document.getElementById('middleName').value;
+            const lastName = document.getElementById('lastName').value;
             const county = document.getElementById('county').value;
             const subCounty = document.getElementById('subCounty').value;
             const ward = document.getElementById('ward').value;
 
-            document.getElementById('submitBtn').innerText = "Processing...";
+            if (password !== confirmPass) return alert("Passwords do not match!");
+            if (!county || !subCounty) return alert("Please select your location.");
+
+            document.getElementById('submitBtn').innerText = "Creating Account...";
             document.getElementById('submitBtn').disabled = true;
 
-            const { error } = await window.supabaseClient.auth.signUp({
-                email, password,
+            const { data, error } = await window.supabaseClient.auth.signUp({
+                email: email,
+                password: password,
                 options: {
                     data: {
-                        full_name: fullName,
+                        full_name: `${firstName} ${middleName} ${lastName}`.trim(),
                         phone_number: document.getElementById('phone').value,
                         id_number: document.getElementById('docNumber').value,
                         document_type: document.getElementById('docType').value,
-                        // Location Data to be saved in Profile
+                        // Location Data
                         country: "Kenya",
                         county: county,
-                        sub_county: subCounty, // We need to ensure this column exists or map it to city
-                        city: ward // Using 'city' column for specific ward/estate location
+                        sub_county: subCounty,
+                        city: ward
                     }
                 }
             });
 
             if (error) {
                 alert(error.message);
-                document.getElementById('submitBtn').innerText = "Apply";
+                document.getElementById('submitBtn').innerText = "Apply for Membership";
                 document.getElementById('submitBtn').disabled = false;
             } else {
                 window.location.href = "payment.html?mode=onboarding";
             }
-        };
+        });
 
-        // Start
+        // Initialize
         initLocation();
     </script>
 </body>
