@@ -4,7 +4,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="icon" type="image/png" href="logo.png">
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>JuvinalPay | Member Application</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -19,86 +19,98 @@
 
     <div class="gradient-brand p-12 text-white text-center rounded-b-[60px] shadow-2xl">
         <header class="text-center mb-8 flex flex-col items-center justify-center">
-            <img src="logo.png" alt="JuvinalPay" class="h-44 max-h-60 w-auto mx-auto mb-4 object-contain drop-shadow-xl">
+            <img src="logo.png" alt="JuvinalPay" class="h-32 w-auto mx-auto mb-4 object-contain drop-shadow-xl">
             <h1 class="text-2xl font-bold text-slate-900">Join the Community</h1>
             <p class="text-xs text-slate-400 mt-1">Create your SACCO account today.</p>
         </header>
     </div>
 
-    <main class="flex-grow flex items-center justify-center p-6 -mt-16 pb-10">
-        <div class="w-full max-w-xl bg-white rounded-[40px] shadow-2xl p-10 border border-slate-100">
+    <main class="flex-grow flex items-center justify-center p-6 -mt-10 pb-10">
+        <div class="w-full max-w-xl bg-white rounded-[40px] shadow-2xl p-8 border border-slate-100">
             <form id="registerForm" class="space-y-6">
                 
-                <div class="grid grid-cols-3 gap-3">
-                    <div class="col-span-1">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
                         <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-2 block">First Name</label>
-                        <input type="text" id="firstName" required class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-sm">
+                        <input type="text" id="firstName" required class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-sm focus:border-indigo-500 focus:bg-white transition-colors">
                     </div>
-                    <div class="col-span-1">
+                    <div>
                         <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Middle Name</label>
-                        <input type="text" id="middleName" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-sm">
+                        <input type="text" id="middleName" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-sm focus:border-indigo-500 focus:bg-white transition-colors">
                     </div>
-                    <div class="col-span-1">
+                    <div>
                         <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Last Name</label>
-                        <input type="text" id="lastName" required class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-sm">
+                        <input type="text" id="lastName" required class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-sm focus:border-indigo-500 focus:bg-white transition-colors">
                     </div>
                 </div>
 
-                <div class="bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100">
+                <div class="bg-indigo-50/50 p-5 rounded-2xl border border-indigo-100">
                     <p class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mb-3">Residential Details</p>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div class="col-span-2">
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="md:col-span-2">
                             <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 mb-1 block">County</label>
-                            <select id="county" onchange="loadSubCounties()" class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm font-bold outline-none text-slate-700">
+                            <select id="county" onchange="loadSubCounties()" class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm font-bold outline-none text-slate-700 focus:border-indigo-500">
                                 <option value="" disabled selected>Select County</option>
                             </select>
                         </div>
                         <div>
                             <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 mb-1 block">Sub-County</label>
-                            <select id="subCounty" disabled class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm font-bold outline-none text-slate-700 disabled:opacity-50">
+                            <select id="subCounty" disabled class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm font-bold outline-none text-slate-700 disabled:opacity-50 focus:border-indigo-500">
                                 <option value="" disabled selected>Select County First</option>
                             </select>
                         </div>
                         <div>
                             <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 mb-1 block">Ward / Estate</label>
-                            <input type="text" id="ward" placeholder="e.g. Utawala" required class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm font-bold outline-none">
+                            <input type="text" id="ward" placeholder="e.g. Utawala" required class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm font-bold outline-none focus:border-indigo-500">
                         </div>
                     </div>
                 </div>
 
                 <div class="space-y-4">
-                    <select id="docType" onchange="handleDocType()" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-sm text-slate-700">
-                        <option value="" disabled selected>Select Document Type</option>
-                        <option value="national_id">National ID</option>
-                        <option value="passport">Passport</option>
-                        <option value="other">Other</option>
-                    </select>
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Identity Document</label>
+                        <select id="docType" onchange="handleDocType()" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-sm text-slate-700 focus:border-indigo-500">
+                            <option value="" disabled selected>Select Document Type</option>
+                            <option value="national_id">National ID</option>
+                            <option value="passport">Passport</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
                     
                     <div id="otherDocContainer" class="hidden">
-                        <input type="text" id="otherDocName" placeholder="Specify Document Name" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-sm">
+                        <input type="text" id="otherDocName" placeholder="Specify Document Name" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-sm focus:border-indigo-500">
                     </div>
                     <div id="docNumberContainer" class="hidden">
-                        <input type="text" id="docNumber" placeholder="Document Number" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-sm">
+                        <input type="text" id="docNumber" placeholder="Document Number" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-sm focus:border-indigo-500">
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <input type="tel" id="phone" required placeholder="M-Pesa Number" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-sm">
-                    <input type="email" id="email" required placeholder="Email" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-sm">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Phone</label>
+                        <input type="tel" id="phone" required placeholder="M-Pesa Number" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-sm focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Email</label>
+                        <input type="email" id="email" required placeholder="Email Address" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-sm focus:border-indigo-500">
+                    </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="relative">
-                        <input type="password" id="password" required placeholder="Password" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-sm pr-10">
-                        <button type="button" onclick="togglePass('password')" class="absolute right-3 top-4 text-slate-400">👁️</button>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Password</label>
+                        <input type="password" id="password" required placeholder="Create Password" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-sm pr-10 focus:border-indigo-500">
+                        <button type="button" onclick="togglePass('password')" class="absolute right-4 top-9 text-slate-400">👁️</button>
                     </div>
                     <div class="relative">
-                        <input type="password" id="confirmPassword" required placeholder="Confirm" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-sm pr-10">
-                        <button type="button" onclick="togglePass('confirmPassword')" class="absolute right-3 top-4 text-slate-400">👁️</button>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Confirm</label>
+                        <input type="password" id="confirmPassword" required placeholder="Confirm Password" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-sm pr-10 focus:border-indigo-500">
+                        <button type="button" onclick="togglePass('confirmPassword')" class="absolute right-4 top-9 text-slate-400">👁️</button>
                     </div>
                 </div>
 
-                <button type="submit" id="submitBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-5 rounded-[24px] shadow-xl transition-all active:scale-95">
+                <button type="submit" id="submitBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-5 rounded-[24px] shadow-xl transition-all active:scale-95 mt-4 text-lg">
                     Apply for Membership
                 </button>
 
