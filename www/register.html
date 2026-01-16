@@ -185,39 +185,7 @@
             "Kisii": ["Bonchari", "South Mugirango", "Bomachoge Borabu", "Bobasi", "Bomachoge Chache", "Nyaribari Masaba", "Nyaribari Chache", "Kitutu Chache North", "Kitutu Chache South"],
             "Nyamira": ["Kitutu Masaba", "West Mugirango", "North Mugirango", "Borabu"],
             "Nairobi": ["Westlands", "Dagoretti North", "Dagoretti South", "Langata", "Kibra", "Roysambu", "Kasarani", "Ruaraka", "Embakasi South", "Embakasi North", "Embakasi Central", "Embakasi East", "Embakasi West", "Makadara", "Kamukunji", "Starehe", "Mathare"]
-        };
-
-        function initLocation() {
-            const countySelect = document.getElementById('county');
-            // Populate Counties (Sorted)
-            Object.keys(kenyaData).sort().forEach(county => {
-                const opt = document.createElement('option');
-                opt.value = county;
-                opt.innerText = county;
-                countySelect.appendChild(opt);
-            });
-        }
-
-        function loadSubCounties() {
-            const county = document.getElementById('county').value;
-            const subSelect = document.getElementById('subCounty');
-            
-            subSelect.innerHTML = '<option value="" disabled selected>Select Sub-County</option>';
-            subSelect.disabled = false;
-
-            if (kenyaData[county]) {
-                kenyaData[county].sort().forEach(sub => {
-                    const opt = document.createElement('option');
-                    opt.value = sub;
-                    opt.innerText = sub;
-                    subSelect.appendChild(opt);
-                });
-            }
-        }
-
-        // --- UTILS ---
-        function togglePass(id) {
-            const input = document.getElementById(id);
+            </form>
             input.type = input.type === 'password' ? 'text' : 'password';
         }
 
