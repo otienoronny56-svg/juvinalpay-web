@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+            <!-- Font Awesome for modern icons -->
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <link rel="icon" type="image/png" href="logo.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JuvinalPay | Member Application</title>
@@ -16,110 +19,262 @@
 <body class="bg-slate-50 min-h-screen flex flex-col">
 
     <div class="gradient-brand p-12 text-white text-center rounded-b-[60px] shadow-2xl">
-        <h1 class="text-4xl font-extrabold italic tracking-tighter text-white">JuvinalPay<span class="text-emerald-400">.</span></h1>
-        <p class="mt-2 text-indigo-200 font-medium text-sm uppercase tracking-widest">Digital Cooperative Movement</p>
+        <header class="text-center mb-8 flex flex-col items-center justify-center">
+            <img src="logo.png" alt="JuvinalPay" class="h-44 max-h-60 w-auto mx-auto mb-4 object-contain drop-shadow-xl">
+            <h1 class="text-2xl font-bold text-slate-900">Join the Community</h1>
+            <p class="text-xs text-slate-400 mt-1">Create your SACCO account today.</p>
+        </header>
     </div>
 
     <main class="flex-grow flex items-center justify-center p-6 -mt-16">
         <div class="w-full max-w-xl bg-white rounded-[40px] shadow-2xl p-10 border border-slate-100">
             <form id="registerForm" class="space-y-6">
                 
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Legal Full Name</label>
-                    <input type="text" id="fullName" required placeholder="As per National ID" 
-                        class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none font-semibold text-sm">
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-2 block">National ID Number</label>
-                        <input type="text" id="idNumber" required placeholder="12345678" 
-                            class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none font-semibold text-sm">
+                <div class="grid grid-cols-3 gap-3">
+                    <div class="col-span-1">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-2 block">First Name</label>
+                        <input type="text" id="firstName" required class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-sm">
                     </div>
-                    <div>
-                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-2 block">M-Pesa Number</label>
-                        <input type="tel" id="phone" required placeholder="0712..." 
-                            class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none font-semibold text-sm">
+                    <div class="col-span-1">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Middle Name</label>
+                        <input type="text" id="middleName" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-sm">
+                    </div>
+                    <div class="col-span-1">
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Last Name</label>
+                        <input type="text" id="lastName" required class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-sm">
                     </div>
                 </div>
 
-                <div>
-                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-1 mb-2 block">Email Address</label>
-                    <input type="email" id="email" required placeholder="you@example.com" 
-                        class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none font-semibold text-sm">
+                <div class="bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100">
+                    <p class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mb-3">Residential Details</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="col-span-2">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 mb-1 block">County</label>
+                            <select id="county" onchange="loadSubCounties()" class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm font-bold outline-none text-slate-700">
+                                <option value="" disabled selected>Select County</option>
+                                </select>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 mb-1 block">Sub-County</label>
+                            <select id="subCounty" disabled class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm font-bold outline-none text-slate-700 disabled:opacity-50">
+                                <option value="" disabled selected>Select County First</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-1 mb-1 block">Ward / Estate</label>
+                            <input type="text" id="ward" placeholder="e.g. Utawala" required class="w-full p-3 bg-white border border-slate-200 rounded-xl text-sm font-bold outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <select id="docType" onchange="handleDocType()" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-sm text-slate-700">
+                        <option value="" disabled selected>Select Document Type</option>
+                        <option value="national_id">National ID</option>
+                        <option value="passport">Passport</option>
+                        <option value="other">Other</option>
+                    </select>
+                    
+                    <div id="otherDocContainer" class="hidden">
+                        <input type="text" id="otherDocName" placeholder="Specify Document Name" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-sm">
+                    </div>
+                    <div id="docNumberContainer" class="hidden">
+                        <input type="text" id="docNumber" placeholder="Document Number" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-sm">
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
-                    <input type="password" id="password" required placeholder="Access Key" 
-                        class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none font-semibold text-sm">
-                    <input type="password" id="confirmPassword" required placeholder="Confirm Key" 
-                        class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none font-semibold text-sm">
+                    <input type="tel" id="phone" required placeholder="M-Pesa Number" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-sm">
+                    <input type="email" id="email" required placeholder="Email" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-sm">
                 </div>
 
-                <button type="submit" id="submitBtn"
-                    class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-5 rounded-[24px] shadow-xl transition-all active:scale-95 disabled:opacity-50">
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="relative">
+                        <input type="password" id="password" required placeholder="Password" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-sm pr-10">
+                        <button type="button" onclick="togglePass('password')" class="absolute right-3 top-4 text-slate-400">👁️</button>
+                    </div>
+                    <div class="relative">
+                        <input type="password" id="confirmPassword" required placeholder="Confirm" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-sm pr-10">
+                        <button type="button" onclick="togglePass('confirmPassword')" class="absolute right-3 top-4 text-slate-400">👁️</button>
+                    </div>
+                </div>
+
+                <button type="submit" id="submitBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-5 rounded-[24px] shadow-xl transition-all active:scale-95">
                     Apply for Membership
                 </button>
 
-                <p class="text-center text-xs text-slate-400 font-medium">
-                    Already a member? <a href="login.html" class="text-indigo-600 font-bold hover:underline">Log in here</a>
-                </p>
+                <p class="text-center text-xs text-slate-400 font-medium">Already a member? <a href="login.html" class="text-indigo-600 font-bold hover:underline">Log in</a></p>
             </form>
         </div>
-    </main>
+        </main>
 
-    <footer class="p-8 text-center text-slate-400 text-[10px] font-bold uppercase tracking-widest">
-        Institutional Trust &copy; 2026 JuvinalPay SACCO
-    </footer>
+        <nav class="fixed bottom-0 w-full bg-white border-t border-slate-100 pb-4 pt-2 px-6 flex justify-between z-30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+            <a href="dashboard.html" class="flex flex-col items-center gap-1 p-2 text-slate-400 hover:text-slate-900 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                    <path d="M11.47 3.84a.75.75 0 011.06 0l8.635 8.635a.75.75 0 11-1.06 1.06l-.375-.375v4.425a.75.75 0 01-.75.75H16.5V13.5a1.5 1.5 0 00-1.5-1.5h-6a1.5 1.5 0 00-1.5 1.5v4.885H4.125a.75.75 0 01-.75-.75V13.16l-.375.375a.75.75 0 11-1.06-1.06L11.47 3.84z" />
+                </svg>
+                <span class="text-[10px] font-bold">Home</span>
+            </a>
+            <a href="loans.html" class="flex flex-col items-center gap-1 p-2 text-slate-400 hover:text-slate-900 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                    <path fill-rule="evenodd" d="M7.5 6v.75H5.513c-.96 0-1.764.724-1.865 1.679l-1.263 12A1.875 1.875 0 004.25 22.5h15.5a1.875 1.875 0 001.865-2.071l-1.263-12a1.875 1.875 0 00-1.865-1.679H16.5V6a4.5 4.5 0 10-9 0zM12 3a3 3 0 00-3 3v.75h6V6a3 3 0 00-3-3zm-3 8.25a3 3 0 106 0v-.75a.75.75 0 011.5 0v.75a4.5 4.5 0 11-9 0v-.75a.75.75 0 011.5 0v.75z" clip-rule="evenodd" />
+                </svg>
+                <span class="text-[10px] font-bold">Loans</span>
+            </a>
+            <a href="activity.html" class="flex flex-col items-center gap-1 p-2 text-slate-400 hover:text-slate-900 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                    <path fill-rule="evenodd" d="M12 2.25a9.75 9.75 0 100 19.5 9.75 9.75 0 000-19.5zM12 18a6 6 0 110-12 6 6 0 010 12zm.75-9.75a.75.75 0 00-1.5 0v3.19l2.72 1.63a.75.75 0 10.76-1.29l-2.23-1.34V8.25z" clip-rule="evenodd" />
+                </svg>
+                <span class="text-[10px] font-bold">Activity</span>
+            </a>
+            <a href="profile.html" class="flex flex-col items-center gap-1 p-2 text-slate-400 hover:text-slate-900 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                    <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clip-rule="evenodd" />
+                </svg>
+                <span class="text-[10px] font-bold">Profile</span>
+            </a>
+        </nav>
 
     <script>
-        const form = document.getElementById('registerForm');
-        const submitBtn = document.getElementById('submitBtn');
+        // --- KENYA DATA ENGINE ---
+        const kenyaData = {
+            "Mombasa": ["Changamwe", "Jomvu", "Kisauni", "Nyali", "Likoni", "Mvita"],
+            "Kwale": ["Msambweni", "Lunga Lunga", "Matuga", "Kinango"],
+            "Kilifi": ["Kilifi North", "Kilifi South", "Kaloleni", "Rabai", "Ganze", "Malindi", "Magarini"],
+            "Tana River": ["Garsen", "Galole", "Bura"],
+            "Lamu": ["Lamu East", "Lamu West"],
+            "Taita Taveta": ["Taveta", "Wundanyi", "Mwatate", "Voi"],
+            "Garissa": ["Garissa Township", "Balambala", "Lagdera", "Dadaab", "Fafi", "Ijara"],
+            "Wajir": ["Wajir North", "Wajir East", "Tarbaj", "Wajir West", "Eldas", "Wajir South"],
+            "Mandera": ["Mandera West", "Banissa", "Mandera North", "Mandera South", "Mandera East", "Lafey"],
+            "Marsabit": ["Moyale", "North Horr", "Saku", "Laisamis"],
+            "Isiolo": ["Isiolo North", "Isiolo South"],
+            "Meru": ["Igembe South", "Igembe Central", "Igembe North", "Tigania West", "Tigania East", "North Imenti", "Buuri", "Central Imenti", "South Imenti"],
+            "Tharaka-Nithi": ["Maara", "Chuka/Igambang'ombe", "Tharaka"],
+            "Embu": ["Manyatta", "Runyenjes", "Mbeere North", "Mbeere South"],
+            "Kitui": ["Mwingi North", "Mwingi West", "Mwingi Central", "Kitui West", "Kitui Rural", "Kitui Central", "Kitui East", "Kitui South"],
+            "Machakos": ["Masinga", "Yatta", "Kangundo", "Matungulu", "Kathiani", "Mavoko", "Machakos Town", "Mwala"],
+            "Makueni": ["Mbooni", "Kilome", "Kaiti", "Makueni", "Kibwezi West", "Kibwezi East"],
+            "Nyandarua": ["Kinangop", "Kipipiri", "Ol Kalou", "Ol Jorok", "Ndaragwa"],
+            "Nyeri": ["Tetu", "Kieni", "Mathira", "Othaya", "Mukurweini", "Nyeri Town"],
+            "Kirinyaga": ["Mwea", "Gichugu", "Ndia", "Kirinyaga Central"],
+            "Murang'a": ["Kangema", "Mathioya", "Kiharu", "Kigumo", "Maragua", "Kandara", "Gatanga"],
+            "Kiambu": ["Gatundu South", "Gatundu North", "Juja", "Thika Town", "Ruiru", "Githunguri", "Kiambu", "Kiambaa", "Kabete", "Kikuyu", "Limuru", "Lari"],
+            "Turkana": ["Turkana North", "Turkana West", "Turkana Central", "Loima", "Turkana South", "Turkana East"],
+            "West Pokot": ["Kapenguria", "Sigor", "Kacheliba", "Pokot South"],
+            "Samburu": ["Samburu West", "Samburu North", "Samburu East"],
+            "Trans Nzoia": ["Kwanza", "Endebess", "Saboti", "Kiminini", "Cherangany"],
+            "Uasin Gishu": ["Soy", "Turbo", "Moiben", "Ainabkoi", "Kapseret", "Kesses"],
+            "Elgeyo-Marakwet": ["Marakwet East", "Marakwet West", "Keiyo North", "Keiyo South"],
+            "Nandi": ["Tinderet", "Aldai", "Nandi Hills", "Chesumei", "Emgwen", "Mosop"],
+            "Baringo": ["Tiaty", "Baringo North", "Baringo Central", "Baringo South", "Mogotio", "Eldama Ravine"],
+            "Laikipia": ["Laikipia West", "Laikipia East", "Laikipia North"],
+            "Nakuru": ["Molo", "Njoro", "Naivasha", "Gilgil", "Kuresoi South", "Kuresoi North", "Subukia", "Rongai", "Bahati", "Nakuru Town West", "Nakuru Town East"],
+            "Narok": ["Kilgoris", "Emurua Dikirr", "Narok North", "Narok East", "Narok South", "Narok West"],
+            "Kajiado": ["Kajiado North", "Kajiado Central", "Kajiado East", "Kajiado West", "Kajiado South"],
+            "Kericho": ["Kipkelion East", "Kipkelion West", "Ainamoi", "Bureti", "Belgut", "Sigowet/Soin"],
+            "Bomet": ["Sotik", "Chepalungu", "Bomet East", "Bomet Central", "Konoin"],
+            "Kakamega": ["Lugari", "Likuyani", "Malava", "Lurambi", "Navakholo", "Mumias West", "Mumias East", "Matungu", "Butere", "Khwisero", "Shinyalu", "Ikolomani"],
+            "Vihiga": ["Vihiga", "Sabatia", "Hamisi", "Luanda", "Emuhaya"],
+            "Bungoma": ["Mt. Elgon", "Sirisia", "Kabuchai", "Bumula", "Kanduyi", "Webuye East", "Webuye West", "Kimilili", "Tongaren"],
+            "Busia": ["Teso North", "Teso South", "Nambale", "Matayos", "Butula", "Funyula", "Budalangi"],
+            "Siaya": ["Ugenya", "Ugunja", "Alego Usonga", "Gem", "Bondo", "Rarieda"],
+            "Kisumu": ["Kisumu East", "Kisumu West", "Kisumu Central", "Seme", "Nyando", "Muhoroni", "Nyakach"],
+            "Homa Bay": ["Kasipul", "Kabondo Kasipul", "Karachuonyo", "Rangwe", "Homa Bay Town", "Ndhiwa", "Suba North", "Suba South"],
+            "Migori": ["Rongo", "Awendo", "Suna East", "Suna West", "Uriri", "Nyatike", "Kuria West", "Kuria East"],
+            "Kisii": ["Bonchari", "South Mugirango", "Bomachoge Borabu", "Bobasi", "Bomachoge Chache", "Nyaribari Masaba", "Nyaribari Chache", "Kitutu Chache North", "Kitutu Chache South"],
+            "Nyamira": ["Kitutu Masaba", "West Mugirango", "North Mugirango", "Borabu"],
+            "Nairobi": ["Westlands", "Dagoretti North", "Dagoretti South", "Langata", "Kibra", "Roysambu", "Kasarani", "Ruaraka", "Embakasi South", "Embakasi North", "Embakasi Central", "Embakasi East", "Embakasi West", "Makadara", "Kamukunji", "Starehe", "Mathare"]
+        };
 
+        function initLocation() {
+            const countySelect = document.getElementById('county');
+            // Populate Counties (Sorted)
+            Object.keys(kenyaData).sort().forEach(county => {
+                const opt = document.createElement('option');
+                opt.value = county;
+                opt.innerText = county;
+                countySelect.appendChild(opt);
+            });
+        }
+
+        function loadSubCounties() {
+            const county = document.getElementById('county').value;
+            const subSelect = document.getElementById('subCounty');
+            
+            subSelect.innerHTML = '<option value="" disabled selected>Select Sub-County</option>';
+            subSelect.disabled = false;
+
+            if (kenyaData[county]) {
+                kenyaData[county].sort().forEach(sub => {
+                    const opt = document.createElement('option');
+                    opt.value = sub;
+                    opt.innerText = sub;
+                    subSelect.appendChild(opt);
+                });
+            }
+        }
+
+        // --- UTILS ---
+        function togglePass(id) {
+            const input = document.getElementById(id);
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        function handleDocType() {
+            const type = document.getElementById('docType').value;
+            document.getElementById('docNumberContainer').classList.remove('hidden');
+            document.getElementById('otherDocContainer').classList.toggle('hidden', type !== 'other');
+        }
+
+        const form = document.getElementById('registerForm');
         form.onsubmit = async (e) => {
             e.preventDefault();
-            
-            if (!window.supabaseClient) {
-                return alert("System Error: Supabase connection failed. Check your config file.");
-            }
+            if (!window.supabaseClient) return alert("Supabase config missing.");
 
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const confirm = document.getElementById('confirmPassword').value;
-            const fullName = document.getElementById('fullName').value;
-            const phone = document.getElementById('phone').value;
-            const idNumber = document.getElementById('idNumber').value;
+            if (password !== confirm) return alert("Passwords do not match.");
 
-            if (password !== confirm) {
-                return alert("Access Keys do not match. Please verify.");
-            }
+            const fullName = `${document.getElementById('firstName').value} ${document.getElementById('middleName').value} ${document.getElementById('lastName').value}`.replace(/\s+/g, ' ').trim();
+            
+            // Collect Smart Location Data
+            const county = document.getElementById('county').value;
+            const subCounty = document.getElementById('subCounty').value;
+            const ward = document.getElementById('ward').value;
 
-            submitBtn.disabled = true;
-            submitBtn.innerText = "Processing Application...";
+            document.getElementById('submitBtn').innerText = "Processing...";
+            document.getElementById('submitBtn').disabled = true;
 
-            // Sign Up User and pass metadata for the SQL Trigger
-            const { data, error } = await window.supabaseClient.auth.signUp({
-                email: email,
-                password: password,
+            const { error } = await window.supabaseClient.auth.signUp({
+                email, password,
                 options: {
                     data: {
                         full_name: fullName,
-                        phone_number: phone,
-                        id_number: idNumber
+                        phone_number: document.getElementById('phone').value,
+                        id_number: document.getElementById('docNumber').value,
+                        document_type: document.getElementById('docType').value,
+                        // Location Data to be saved in Profile
+                        country: "Kenya",
+                        county: county,
+                        sub_county: subCounty, // We need to ensure this column exists or map it to city
+                        city: ward // Using 'city' column for specific ward/estate location
                     }
                 }
             });
 
             if (error) {
-                alert("Error: " + error.message);
-                submitBtn.disabled = false;
-                submitBtn.innerText = "Apply for Membership";
+                alert(error.message);
+                document.getElementById('submitBtn').innerText = "Apply";
+                document.getElementById('submitBtn').disabled = false;
             } else {
-                console.log("Member Auth Created. Redirecting to Payment...");
-                // Redirect to flat payment page
-                window.location.href = "payment.html"; 
+                window.location.href = "payment.html?mode=onboarding";
             }
         };
+
+        // Start
+        initLocation();
     </script>
 </body>
 </html>

@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
+        body.dark { background-color: #0f172a; color: #f8fafc; }
+        body.dark .bg-white { background-color: #1e293b !important; border-color: #334155 !important; color: white !important; }
+        body.dark .text-slate-900 { color: white !important; }
+        body.dark .text-slate-800 { color: #cbd5e1 !important; }
+        .hide-scroll::-webkit-scrollbar { display: none; }
+    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JuvinalPay | Transfer</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font family and background handled above -->
+</head>
+<body class="text-slate-900 pb-24">
+
+
+    <script>
+        // Global Theme Logic
+        function applyTheme() {
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark');
+            } else {
+                document.body.classList.remove('dark');
+            }
+        }
+        applyTheme();
+        window.addEventListener('storage', applyTheme);
+    </script>
+
+    <div class="bg-white rounded-t-[32px] h-[92vh] w-full flex flex-col relative animate-slide-up">
+        <div class="w-12 h-1 bg-slate-200 rounded-full mx-auto mb-6 mt-6"></div>
+
+        <div class="px-8 pb-10 flex-1 flex flex-col overflow-y-auto">
+            <header class="text-center mb-8">
+                <h1 class="text-2xl font-extrabold text-slate-900">Move Funds</h1>
+                <p class="text-xs text-slate-400 mt-1 font-medium">Internal Transfers & Investments</p>
+            </header>
+
+            <div class="space-y-4 mb-6">
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex items-center gap-3">
+                    <div class="h-10 w-10 bg-white rounded-full flex items-center justify-center text-xl shadow-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 text-emerald-600">
+                            <path d="M12 1.5a5.25 5.25 0 00-5.25 5.25v3a3 3 0 00-3 3v6.75a3 3 0 003 3h10.5a3 3 0 003-3v-6.75a3 3 0 00-3-3v-3c0-2.9-2.35-5.25-5.25-5.25zm3.75 8.25v-3a3.75 3.75 0 10-7.5 0v3h7.5z" />
+                        </svg>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase">From Main Savings</p>
+                        <p class="font-bold text-slate-900 text-sm" id="savingsBal">Checking...</p>
+                    </div>
+                </div>
+
+                <div class="flex justify-center -my-3 relative z-10 text-slate-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-6 h-6">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                </div>
+
+                <div class="bg-indigo-50 p-4 rounded-2xl border border-indigo-100">
+                    <p class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest mb-2">Transfer To</p>
+                    <select id="destAccount" onchange="handleDestChange()" class="w-full bg-white p-3 rounded-xl font-bold text-slate-700 outline-none border border-indigo-200 focus:ring-2 focus:ring-indigo-500">
+                        <option value="locked_savings">🔒 Locked Savings (Fixed Deposit)</option>
+                        <option value="share_capital">📈 Share Capital (Permanent)</option>
+                    </select>
+                </div>
+    <!-- Modern Bottom Navigation Bar -->
+    <nav class="fixed bottom-0 w-full bg-white border-t border-slate-100 pb-4 pt-2 px-6 flex justify-between z-30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        <a href="dashboard.html" class="flex flex-col items-center gap-1 p-2 text-indigo-600">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                <path d="M11.47 3.84a.75.75 0 011.06 0l8.635 8.635a.75.75 0 11-1.06 1.06l-.375-.375v4.425a.75.75 0 01-.75.75H16.5V13.5a1.5 1.5 0 00-1.5-1.5h-6a1.5 1.5 0 00-1.5 1.5v4.885H4.125a.75.75 0 01-.75-.75V13.16l-.375.375a.75.75 0 11-1.06-1.06L11.47 3.84z" />
+            </svg>
+            <span class="text-[10px] font-bold">Home</span>
+        </a>
+        <a href="loans.html" class="flex flex-col items-center gap-1 p-2 text-slate-400 hover:text-slate-900 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                <path fill-rule="evenodd" d="M7.5 6v.75H5.513c-.96 0-1.764.724-1.865 1.679l-1.263 12A1.875 1.875 0 004.25 22.5h15.5a1.875 1.875 0 001.865-2.071l-1.263-12a1.875 1.875 0 00-1.865-1.679H16.5V6a4.5 4.5 0 10-9 0zM12 3a3 3 0 00-3 3v.75h6V6a3 3 0 00-3-3zm-3 8.25a3 3 0 106 0v-.75a.75.75 0 011.5 0v.75a4.5 4.5 0 11-9 0v-.75a.75.75 0 011.5 0v.75z" clip-rule="evenodd" />
+            </svg>
+            <span class="text-[10px] font-bold">Loans</span>
+        </a>
+        <a href="profile.html" class="flex flex-col items-center gap-1 p-2 text-slate-400 hover:text-slate-900 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clip-rule="evenodd" />
+            </svg>
+            <span class="text-[10px] font-bold">Profile</span>
+        </a>
+    </nav>
+
+                <div id="durationDiv" class="bg-emerald-50 p-4 rounded-2xl border border-emerald-100">
+                    <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest mb-2">Lock Duration</p>
+                    <div class="grid grid-cols-3 gap-2">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="duration" value="3" class="peer sr-only" checked>
+                            <div class="bg-white peer-checked:bg-emerald-500 peer-checked:text-white text-slate-600 font-bold py-2 rounded-xl text-center text-xs transition-all border border-emerald-200 shadow-sm">3 Mos</div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="duration" value="6" class="peer sr-only">
+                            <div class="bg-white peer-checked:bg-emerald-500 peer-checked:text-white text-slate-600 font-bold py-2 rounded-xl text-center text-xs transition-all border border-emerald-200 shadow-sm">6 Mos</div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="duration" value="12" class="peer sr-only">
+                            <div class="bg-white peer-checked:bg-emerald-500 peer-checked:text-white text-slate-600 font-bold py-2 rounded-xl text-center text-xs transition-all border border-emerald-200 shadow-sm">1 Year</div>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-auto">
+                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-2 mb-2 block">Amount</label>
+                <input type="number" id="amount" class="w-full p-5 bg-white border-2 border-slate-100 rounded-2xl font-bold text-slate-900 text-3xl outline-none focus:border-indigo-500 placeholder:text-slate-200" placeholder="0">
+            </div>
+
+            <button onclick="processTransfer()" id="tBtn" class="w-full bg-slate-900 text-white font-bold py-5 rounded-2xl shadow-xl active:scale-95 transition-all mb-4 mt-6">
+                Confirm Investment
+            </button>
+            <button onclick="location.href='dashboard.html'" class="text-xs font-bold text-slate-400 text-center pb-8">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        let savingsBalance = 0;
+
+        async function init() {
+            if (!window.supabaseClient) return;
+            const { data: { user } } = await window.supabaseClient.auth.getUser();
+            if (!user) return location.href = "login.html";
+
+            const { data: profile } = await window.supabaseClient.from('profiles').select('savings_balance').eq('id', user.id).single();
+            savingsBalance = profile?.savings_balance || 0;
+            document.getElementById('savingsBal').innerText = `Avail: KES ${savingsBalance.toLocaleString()}`;
+        }
+
+        function handleDestChange() {
+            const dest = document.getElementById('destAccount').value;
+            const durDiv = document.getElementById('durationDiv');
+            if (dest === 'locked_savings') {
+                durDiv.classList.remove('hidden');
+                document.getElementById('tBtn').innerText = "Confirm Investment";
+            } else {
+                durDiv.classList.add('hidden');
+                document.getElementById('tBtn').innerText = "Confirm Transfer";
+            }
+        }
+
+        async function processTransfer() {
+            const amount = parseFloat(document.getElementById('amount').value);
+            const dest = document.getElementById('destAccount').value;
+            
+            if(!amount || amount <= 0) return alert("Enter valid amount");
+            if(amount > savingsBalance) return alert("Insufficient savings.");
+
+            const btn = document.getElementById('tBtn');
+            btn.innerText = "Processing..."; btn.disabled = true;
+
+            try {
+                if (dest === 'share_capital') {
+                    // Standard Transfer to Share Capital
+                    if(!confirm("Share Capital is permanent. Continue?")) throw new Error("Cancelled");
+                    
+                    const { error } = await window.supabaseClient.rpc('transfer_internal', {
+                        p_amount: amount, p_source_type: 'savings_balance', p_dest_type: 'share_capital'
+                    });
+                    if(error) throw error;
+
+                } else {
+                    // Locked Savings Investment
+                    const months = parseInt(document.querySelector('input[name="duration"]:checked').value);
+                    if(!confirm(`Lock KES ${amount} for ${months} months?`)) throw new Error("Cancelled");
+
+                    const { error } = await window.supabaseClient.rpc('invest_locked', {
+                        p_amount: amount, p_months: months
+                    });
+                    if(error) throw error;
+                }
+
+                alert("✓ Success!");
+                location.href = "dashboard.html";
+            } catch (err) {
+                if(err.message !== "Cancelled") alert(err.message);
+                btn.innerText = "Confirm"; btn.disabled = false;
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>

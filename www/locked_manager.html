@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+        <style>
+            body.dark { background-color: #0f172a; color: #f8fafc; }
+            body.dark .bg-white { background-color: #1e293b; border-color: #334155; color: white; }
+            body.dark .text-slate-900 { color: white; }
+            body.dark .text-slate-800 { color: #cbd5e1; }
+        </style>
+        <script>
+            // Global Theme Logic
+            function applyTheme() {
+                if (localStorage.getItem('theme') === 'dark') {
+                    document.body.classList.add('dark');
+                } else {
+                    document.body.classList.remove('dark');
+                }
+            }
+            applyTheme();
+            window.addEventListener('storage', applyTheme);
+        </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JuvinalPay | Locked Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; }</style>
+</head>
+<body class="bg-slate-900 min-h-screen p-6">
+
+    <header class="flex justify-between items-center mb-8 pt-4">
+        <div>
+            <h1 class="text-2xl font-extrabold text-white">Locked Assets</h1>
+            <p class="text-xs text-slate-400">Manage your fixed deposits.</p>
+        </div>
+        <button onclick="location.href='transfer.html'" class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-4 py-2 rounded-xl text-xs font-bold">+ New Lock</button>
+    </header>
+
+    <div id="depositList" class="space-y-4">
+        <p class="text-slate-500 text-center py-10 animate-pulse">Loading investments...</p>
+    </div>
+
+    <button onclick="location.href='dashboard.html'" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-slate-800 text-white px-6 py-3 rounded-full text-xs font-bold border border-slate-700 shadow-xl">
+        ← Back to Dashboard
+    </button>
+
+    <script>
+        async function loadDeposits() {
+            if (!window.supabaseClient) return;
+            const { data: { user } } = await window.supabaseClient.auth.getUser();
+
+            const { data: deposits, error } = await window.supabaseClient
+                .from('locked_deposits')
+                .select('*')
+                .eq('user_id', user.id)
+                .order('maturity_date', { ascending: true });
+
+            const list = document.getElementById('depositList');
+            list.innerHTML = '';
+
+            if (!deposits || deposits.length === 0) {
+                list.innerHTML = `<div class="text-center py-20 bg-slate-800/50 rounded-3xl border border-slate-800">
+                    <p class="text-4xl mb-4">🔒</p>
+                    <p class="text-slate-400 font-bold text-sm">No locked savings.</p>
+                    <p class="text-slate-500 text-xs mt-1">Invest now to earn interest.</p>
+                </div>`;
+                return;
+            }
+
+            deposits.forEach(d => {
+                const isRedeemed = d.status === 'redeemed';
+                const isMature = new Date(d.maturity_date) <= new Date();
+                const dateStr = new Date(d.maturity_date).toLocaleDateString();
+
+                // Logic for Button
+                let actionBtn = '';
+                if (isRedeemed) {
+                    actionBtn = `<span class="text-[10px] font-bold text-slate-600 uppercase">Redeemed</span>`;
+                } else if (isMature) {
+                    actionBtn = `<button onclick="redeem('${d.id}')" class="bg-emerald-500 hover:bg-emerald-400 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-lg shadow-emerald-500/20 transition-all active:scale-95">🔓 Redeem Now</button>`;
+                } else {
+                    actionBtn = `<div class="text-right"><p class="text-[10px] text-slate-500 font-bold uppercase">Unlocks On</p><p class="text-xs text-indigo-300 font-bold">${dateStr}</p></div>`;
+                }
+
+                const card = document.createElement('div');
+                card.className = `p-5 rounded-2xl border ${isRedeemed ? 'bg-slate-900 border-slate-800 opacity-50' : 'bg-slate-800 border-slate-700'} flex justify-between items-center`;
+                card.innerHTML = `
+                    <div>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-1">${d.duration_months} Month Lock</p>
+                        <p class="text-xl font-black text-white">KES ${d.amount.toLocaleString()}</p>
+                    </div>
+                    ${actionBtn}
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        async function redeem(id) {
+            if(!confirm("Unlock these funds and move to Main Savings?")) return;
+            
+            const { error } = await window.supabaseClient.rpc('redeem_locked', { p_deposit_id: id });
+            
+            if(error) alert(error.message);
+            else {
+                alert("✓ Funds Unlocked! Check your savings balance.");
+                loadDeposits();
+            }
+        }
+
+        loadDeposits();
+    </script>
+</body>
+</html>

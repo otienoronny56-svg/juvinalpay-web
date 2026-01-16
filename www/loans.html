@@ -1,167 +1,313 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+        <!-- Font Awesome for modern icons -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JuvinalPay | Loans</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JuvinalPay | Loan Manager</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F8FAFC; -webkit-tap-highlight-color: transparent; }
-        .nav-active { color: #4F46E5; }
-        .nav-inactive { color: #94A3B8; }
-        input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; }
-        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 24px; width: 24px; border-radius: 50%; background: #4F46E5; cursor: pointer; margin-top: -10px; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.5); }
-        input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: #E2E8F0; border-radius: 999px; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; }
+        /* Hide scrollbar for clean mobile look */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none;  scrollbar-width: none; }
     </style>
 </head>
-<body class="pb-24">
+<body class="h-screen w-screen flex flex-col justify-end bg-slate-900">
 
-    <header class="pt-8 px-6 pb-4 bg-white sticky top-0 z-10 border-b border-slate-50">
-        <h1 class="text-2xl font-extrabold text-slate-900">Credit Center</h1>
-        <p class="text-xs text-slate-400 font-medium">Borrow against your savings multiplier.</p>
-    </header>
-
-    <main class="px-6 mt-6">
+    <div class="bg-white rounded-t-[32px] h-[92vh] w-full flex flex-col relative animate-slide-up">
         
-        <div class="bg-slate-900 rounded-[32px] p-8 text-center text-white relative overflow-hidden shadow-xl shadow-slate-200">
-            <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500 rounded-full blur-[60px] opacity-30"></div>
-            <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Available Limit</p>
-            <h2 id="maxLimitText" class="text-4xl font-extrabold tracking-tight">Checking...</h2>
-            <div class="mt-4 inline-flex items-center gap-2 bg-white/10 px-3 py-1 rounded-full border border-white/10">
-                <span class="h-2 w-2 bg-emerald-400 rounded-full animate-pulse"></span>
-                <span class="text-[10px] font-bold">3x Multiplier Active</span>
-            </div>
+        <div class="w-full flex justify-center pt-6 pb-2 shrink-0">
+            <div class="w-12 h-1.5 bg-slate-200 rounded-full"></div>
         </div>
 
-        <div id="activeLoanCard" class="hidden mt-6 bg-rose-50 border border-rose-100 rounded-[28px] p-6">
-            <div class="flex justify-between items-center mb-2">
-                <h3 class="text-sm font-bold text-rose-700">Current Debt</h3>
-                <span class="text-[10px] font-black bg-rose-200 text-rose-700 px-2 py-1 rounded">OVERDUE</span>
+        <div class="flex-1 overflow-y-auto px-8 pb-32 no-scrollbar">
+
+            <div id="loadingState" class="text-center py-20">
+                <p class="text-slate-400 font-bold animate-pulse">Syncing Loan Data...</p>
             </div>
-            <p class="text-3xl font-bold text-slate-900" id="debtAmount">KES 0</p>
-            <p class="text-xs text-slate-500 mt-1">Due Date: <span id="dueDate" class="font-bold">...</span></p>
-            <button onclick="window.location.href='payment.html'" class="mt-4 w-full bg-slate-900 text-white font-bold py-3 rounded-xl text-xs">Repay Now</button>
+
+            <div id="activeLoanView" class="hidden flex flex-col pt-4">
+                <div class="text-center mb-8">
+                    <span class="bg-indigo-100 text-indigo-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest">Active Loan</span>
+                    <h1 class="text-4xl font-extrabold text-slate-900 mt-4">KES <span id="owedAmount">0</span></h1>
+                    <p class="text-xs text-slate-400 mt-2 font-medium">Outstanding Balance</p>
+                </div>
+
+                <div class="bg-slate-50 border border-slate-100 p-6 rounded-3xl space-y-4 mb-8">
+                    <div class="flex justify-between">
+                        <span class="text-xs font-bold text-slate-400 uppercase">Principal</span>
+                        <span class="text-sm font-bold text-slate-900" id="principalAmt">...</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-xs font-bold text-slate-400 uppercase">Interest</span>
+                        <span class="text-sm font-bold text-slate-900" id="interestAmt">...</span>
+                    </div>
+                    <div class="border-t border-slate-200 pt-4 flex justify-between">
+                        <span class="text-xs font-bold text-rose-500 uppercase">Due Date</span>
+                        <span class="text-sm font-bold text-rose-500" id="dueDate">...</span>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-2 mb-2 block">Enter Repayment Amount</label>
+                        <input type="number" id="repayInput" class="w-full p-5 bg-white border-2 border-slate-100 rounded-2xl font-bold text-slate-900 text-xl outline-none focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 transition-all placeholder:text-slate-300" placeholder="e.g. 500">
+                    </div>
+                    
+                    <button onclick="repayLoan()" id="repayBtn" class="w-full bg-emerald-500 text-white font-bold py-5 rounded-2xl shadow-xl shadow-emerald-200 active:scale-95 transition-all text-lg">
+                        Pay Now (M-Pesa)
+                    </button>
+                    <p class="text-center text-[10px] text-slate-400 font-medium pt-2">Secured by Safaricom Daraja</p>
+                </div>
+            </div>
+
+            <div id="pendingView" class="hidden text-center py-10">
+                <div class="h-24 w-24 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center text-4xl mx-auto mb-6 shadow-sm border border-amber-100">⏳</div>
+                <h2 class="text-xl font-bold text-slate-900">Application Under Review</h2>
+                <p class="text-sm text-slate-500 mt-2 px-6 leading-relaxed">Your request for <span id="pendingAmt" class="font-bold text-slate-900">...</span> is waiting for admin approval.</p>
+                <button onclick="location.reload()" class="mt-8 text-indigo-600 font-bold text-xs bg-indigo-50 px-4 py-2 rounded-lg hover:bg-indigo-100">Check Status</button>
+            </div>
+
+            <div id="applyView" class="hidden flex flex-col pt-4">
+                <header class="text-center mb-8">
+                    <h1 class="text-2xl font-extrabold text-slate-900">Request Loan</h1>
+                    <p class="text-xs text-slate-400 mt-1 font-medium">Instant limits based on savings.</p>
+                </header>
+
+                <div class="bg-indigo-50 border border-indigo-100 p-5 rounded-3xl mb-8 flex justify-between items-center shadow-sm">
+                    <div>
+                        <p class="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">Max Limit</p>
+                        <h3 id="maxLimitText" class="text-xl font-black text-indigo-900">...</h3>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Min Limit</p>
+                        <h3 id="minLimitText" class="text-xl font-black text-slate-600">...</h3>
+                    </div>
+                </div>
+
+                <div class="space-y-5">
+                    <div class="bg-slate-50 p-6 rounded-3xl border border-slate-100 focus-within:ring-2 focus-within:ring-indigo-500 transition-all">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Loan Amount (KES)</p>
+                        <input type="number" id="loanAmount" class="w-full bg-transparent text-4xl font-extrabold text-slate-900 outline-none placeholder:text-slate-200" placeholder="0">
+                    </div>
+
+                    <div class="relative">
+                        <select id="loanReason" onchange="handleReason()" class="w-full p-5 bg-slate-50 border border-slate-200 rounded-2xl font-bold text-slate-700 outline-none appearance-none">
+                            <option value="" disabled selected>Select Loan Purpose</option>
+                            <option value="Business">Business Investment</option>
+                            <option value="Education">Education / Fees</option>
+                            <option value="Emergency">Medical Emergency</option>
+                            <option value="Personal">Personal Use</option>
+                            <option value="Other">Other</option>
+                        </select>
+                        <div class="absolute right-5 top-5 pointer-events-none text-slate-400">▼</div>
+                    </div>
+                    
+                    <input type="text" id="otherReason" class="hidden w-full p-5 bg-slate-50 border border-slate-200 rounded-2xl font-bold text-slate-700 outline-none" placeholder="Specific Reason...">
+                    
+                    <div class="flex justify-between px-2 py-2">
+                         <p class="text-[10px] text-slate-400 uppercase font-bold">Total Repayment</p>
+                         <p id="repaymentText" class="font-bold text-emerald-600">KES 0</p>
+                    </div>
+
+                    <button onclick="submitApplication()" id="applyBtn" class="w-full bg-slate-900 text-white font-bold py-5 rounded-2xl shadow-xl active:scale-95 transition-all mt-4">
+                        Submit Application
+                    </button>
+                </div>
+            </div>
+
         </div>
+    </div>
 
-        <div id="loanRequestForm" class="mt-8 bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm">
-            <h3 class="font-bold text-slate-900 mb-6">New Request</h3>
-            
-            <div class="mb-8">
-                <div class="flex justify-between mb-4">
-                    <span class="text-xs font-bold text-slate-400">Amount</span>
-                    <span id="sliderVal" class="text-lg font-extrabold text-indigo-600">KES 500</span>
-                </div>
-                <input type="range" id="loanSlider" min="500" step="100" value="500" oninput="updateCalc()">
-                <div class="flex justify-between mt-2">
-                    <span class="text-[10px] text-slate-300 font-bold">500</span>
-                    <span id="sliderMaxLabel" class="text-[10px] text-slate-300 font-bold">...</span>
-                </div>
-            </div>
-
-            <div class="bg-slate-50 rounded-2xl p-4 space-y-3 mb-6">
-                <div class="flex justify-between text-xs">
-                    <span class="text-slate-500 font-medium">Interest (10%)</span>
-                    <span id="interestVal" class="font-bold text-slate-700">KES 50</span>
-                </div>
-                <div class="h-px bg-slate-200"></div>
-                <div class="flex justify-between text-sm">
-                    <span class="text-slate-900 font-bold">Total Repayment</span>
-                    <span id="totalVal" class="font-bold text-indigo-600">KES 550</span>
-                </div>
-            </div>
-
-            <button onclick="submitLoan()" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-2xl shadow-lg shadow-indigo-200 active:scale-95 transition-all">
-                Request Loan
-            </button>
-        </div>
-    </main>
-
-    <nav class="fixed bottom-0 w-full bg-white border-t border-slate-100 px-6 py-4 flex justify-between items-center z-50 pb-8">
-        <a href="dashboard.html" class="flex flex-col items-center gap-1 nav-inactive">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+    <nav class="fixed bottom-0 w-full bg-white border-t border-slate-100 pb-4 pt-2 px-6 flex justify-between z-30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        <a href="dashboard.html" class="flex flex-col items-center gap-1 p-2 text-slate-400 hover:text-slate-900 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                <path d="M11.47 3.84a.75.75 0 011.06 0l8.635 8.635a.75.75 0 11-1.06 1.06l-.375-.375v4.425a.75.75 0 01-.75.75H16.5V13.5a1.5 1.5 0 00-1.5-1.5h-6a1.5 1.5 0 00-1.5 1.5v4.885H4.125a.75.75 0 01-.75-.75V13.16l-.375.375a.75.75 0 11-1.06-1.06L11.47 3.84z" />
+            </svg>
             <span class="text-[10px] font-bold">Home</span>
         </a>
-        <a href="loans.html" class="flex flex-col items-center gap-1 nav-active">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <a href="loans.html" class="flex flex-col items-center gap-1 p-2 text-indigo-600">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                <path fill-rule="evenodd" d="M7.5 6v.75H5.513c-.96 0-1.764.724-1.865 1.679l-1.263 12A1.875 1.875 0 004.25 22.5h15.5a1.875 1.875 0 001.865-2.071l-1.263-12a1.875 1.875 0 00-1.865-1.679H16.5V6a4.5 4.5 0 10-9 0zM12 3a3 3 0 00-3 3v.75h6V6a3 3 0 00-3-3zm-3 8.25a3 3 0 106 0v-.75a.75.75 0 011.5 0v.75a4.5 4.5 0 11-9 0v-.75a.75.75 0 011.5 0v.75z" clip-rule="evenodd" />
+            </svg>
             <span class="text-[10px] font-bold">Loans</span>
         </a>
-        <a href="activity.html" class="flex flex-col items-center gap-1 nav-inactive">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+        <a href="activity.html" class="flex flex-col items-center gap-1 p-2 text-slate-400 hover:text-slate-900 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                <path fill-rule="evenodd" d="M12 2.25a9.75 9.75 0 100 19.5 9.75 9.75 0 000-19.5zM12 18a6 6 0 110-12 6 6 0 010 12zm.75-9.75a.75.75 0 00-1.5 0v3.19l2.72 1.63a.75.75 0 10.76-1.29l-2.23-1.34V8.25z" clip-rule="evenodd" />
+            </svg>
             <span class="text-[10px] font-bold">Activity</span>
         </a>
-        <a href="profile.html" class="flex flex-col items-center gap-1 nav-inactive">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+        <a href="profile.html" class="flex flex-col items-center gap-1 p-2 text-slate-400 hover:text-slate-900 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clip-rule="evenodd" />
+            </svg>
             <span class="text-[10px] font-bold">Profile</span>
         </a>
     </nav>
 
     <script>
-        async function loadLoanData() {
+        let maxLoan=0, minLoan=0, interestRate=0, currentLoanId=null;
+
+        async function init() {
             if (!window.supabaseClient) return;
             const { data: { user } } = await window.supabaseClient.auth.getUser();
-            
-            // 1. Check Savings for Limit
-            const { data: profile } = await window.supabaseClient.from('profiles').select('savings_balance').eq('id', user.id).single();
-            const maxLimit = (profile?.savings_balance || 0) * 3;
-            
-            document.getElementById('maxLimitText').innerText = `KES ${maxLimit.toLocaleString()}`;
-            document.getElementById('sliderMaxLabel').innerText = maxLimit;
-            
-            const slider = document.getElementById('loanSlider');
-            slider.max = maxLimit;
-            
-            // 2. Check for Active Loans
-            const { data: activeLoan } = await window.supabaseClient
+            if (!user) return window.location.href = "login.html";
+
+            // 1. Fetch Loan Status
+            const { data: loans } = await window.supabaseClient
                 .from('sacco_loans')
                 .select('*')
                 .eq('user_id', user.id)
-                .eq('loan_status', 'active') // Ensure you check 'active' status
-                .single();
+                .in('loan_status', ['active', 'pending', 'pending_approval']) 
+                .order('created_at', { ascending: false })
+                .limit(1)
+                .maybeSingle(); 
 
-            if (activeLoan) {
-                // Hide Request Form, Show Debt Card
-                document.getElementById('loanRequestForm').classList.add('hidden');
-                document.getElementById('activeLoanCard').classList.remove('hidden');
-                document.getElementById('debtAmount').innerText = `KES ${(activeLoan.total_repayment - (activeLoan.amount_repaid || 0)).toLocaleString()}`;
-                document.getElementById('dueDate').innerText = new Date(activeLoan.due_date).toLocaleDateString();
+            document.getElementById('loadingState').classList.add('hidden');
+
+            if (loans) {
+                // Map status for display
+                const statusMap = {
+                    'pending': { color: 'text-yellow-500', label: 'Pending Review' },
+                    'active':  { color: 'text-emerald-500', label: 'Active / Approved' },
+                    'paid':    { color: 'text-blue-500',    label: 'Fully Paid' },
+                    'rejected':{ color: 'text-red-500',     label: 'Rejected' }
+                };
+                const statusInfo = statusMap[loans.loan_status] || { color: 'text-slate-500', label: loans.loan_status };
+
+                if (loans.loan_status === 'active') {
+                    // --- ACTIVE LOAN SCREEN ---
+                    document.getElementById('activeLoanView').classList.remove('hidden');
+                    const totalRepay = Math.ceil(loans.total_repayment || loans.amount); 
+                    const amount = loans.amount;
+                    document.getElementById('owedAmount').innerText = totalRepay.toLocaleString();
+                    document.getElementById('principalAmt').innerText = `KES ${amount.toLocaleString()}`;
+                    document.getElementById('interestAmt').innerText = `KES ${(totalRepay - amount).toLocaleString()}`;
+                    document.getElementById('dueDate').innerText = new Date(loans.due_date).toLocaleDateString();
+                    document.getElementById('repayInput').value = totalRepay; 
+                    currentLoanId = loans.id;
+                    // Example: show status in UI (add where needed)
+                    // document.getElementById('loanStatus').innerHTML = `<span class="${statusInfo.color} font-bold">${statusInfo.label}</span>`;
+                } else {
+                    // --- PENDING SCREEN ---
+                    document.getElementById('pendingView').classList.remove('hidden');
+                    document.getElementById('pendingAmt').innerText = `KES ${loans.amount.toLocaleString()}`;
+                    // Example: show status in UI (add where needed)
+                    // document.getElementById('loanStatus').innerHTML = `<span class="${statusInfo.color} font-bold">${statusInfo.label}</span>`;
+                }
+            } else {
+                // --- APPLY SCREEN ---
+                loadApplicationLogic(user.id);
             }
-
-            updateCalc();
         }
 
-        function updateCalc() {
-            const val = parseInt(document.getElementById('loanSlider').value);
-            const interest = val * 0.10;
-            document.getElementById('sliderVal').innerText = `KES ${val.toLocaleString()}`;
-            document.getElementById('interestVal').innerText = `KES ${interest.toLocaleString()}`;
-            document.getElementById('totalVal').innerText = `KES ${(val + interest).toLocaleString()}`;
+        async function loadApplicationLogic(userId) {
+            document.getElementById('applyView').classList.remove('hidden');
+            
+            const { data: config } = await window.supabaseClient.from('sacco_configs').select('*').single();
+            minLoan = config?.min_loan_amount || 10;
+            interestRate = config?.loan_interest_rate || 5;
+            document.getElementById('minLimitText').innerText = `KES ${minLoan}`;
+
+            const { data: profile } = await window.supabaseClient.from('profiles').select('savings_balance').eq('id', userId).single();
+            maxLoan = (profile?.savings_balance || 0) * 3;
+            document.getElementById('maxLimitText').innerText = `KES ${maxLoan.toLocaleString()}`;
+
+            document.getElementById('loanAmount').addEventListener('input', (e) => {
+                const amt = parseFloat(e.target.value) || 0;
+                const total = amt + (amt * (interestRate / 100));
+                document.getElementById('repaymentText').innerText = `KES ${total.toLocaleString()}`;
+            });
         }
 
-        async function submitLoan() {
-            const amount = parseInt(document.getElementById('loanSlider').value);
+        function handleReason() {
+            const val = document.getElementById('loanReason').value;
+            if(val === 'Other') document.getElementById('otherReason').classList.remove('hidden');
+            else document.getElementById('otherReason').classList.add('hidden');
+        }
+
+        async function submitApplication() {
+            const amount = parseFloat(document.getElementById('loanAmount').value);
+            let reason = document.getElementById('loanReason').value;
+            if(reason === 'Other') reason = document.getElementById('otherReason').value;
+
+            if (!amount || amount < minLoan) return alert(`Minimum: KES ${minLoan}`);
+            if (amount > maxLoan) return alert(`Max Limit: KES ${maxLoan}`);
+            if (!reason) return alert("Select a reason.");
+
+            const btn = document.getElementById('applyBtn');
+            btn.innerText = "Submitting..."; btn.disabled = true;
+
             const { data: { user } } = await window.supabaseClient.auth.getUser();
             const { data: profile } = await window.supabaseClient.from('profiles').select('phone_number').eq('id', user.id).single();
-
-            if(!confirm(`Request loan of KES ${amount}?`)) return;
 
             const { error } = await window.supabaseClient.from('sacco_loans').insert({
                 user_id: user.id,
                 amount: amount,
+                loan_status: 'pending_approval',
                 mpesa_number: profile.phone_number,
-                loan_status: 'pending'
+                loan_reason: reason,
+                due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
             });
 
-            if (error) alert("Error: " + error.message);
-            else {
-                alert("Loan Requested! Waiting for Admin Approval.");
-                window.location.reload();
+            if(error) {
+                alert(error.message);
+                btn.innerText = "Submit Application"; 
+                btn.disabled = false;
+            } else {
+                location.reload(); 
             }
         }
 
-        loadLoanData();
+        async function repayLoan() {
+            const amount = document.getElementById('repayInput').value;
+            if(!amount || amount <= 0) return alert("Please enter a valid amount");
+            
+            const btn = document.getElementById('repayBtn');
+            const originalText = btn.innerText;
+            btn.innerText = "Sending M-Pesa Request..."; 
+            btn.disabled = true;
+
+            const { data: { user } } = await window.supabaseClient.auth.getUser();
+            const { data: profile } = await window.supabaseClient.from('profiles').select('phone_number').eq('id', user.id).single();
+            
+            // Format phone: remove 0 or +254, add 254
+            let phone = profile.phone_number.replace(/\D/g, ''); // Remove non-digits
+            if (phone.startsWith('0')) phone = '254' + phone.substring(1);
+            if (phone.startsWith('254')) phone = phone; // already good
+
+            const { data, error } = await window.supabaseClient.functions.invoke('stk-push', {
+                body: { 
+                    phone: phone, 
+                    amount: parseInt(amount), 
+                    depositType: 'loan_repayment' 
+                }
+            });
+            
+            if(data?.CheckoutRequestID) {
+                // Record the intent so we can track it
+                await window.supabaseClient.from('payment_requests').insert({
+                    checkout_request_id: data.CheckoutRequestID,
+                    user_id: user.id,
+                    amount: parseInt(amount),
+                    intent: 'loan_repayment'
+                });
+                alert("✓ STK Push Sent!\n\nCheck your phone to enter your PIN.");
+                btn.innerText = "Waiting for Payment...";
+            } else {
+                alert("Connection Error. Please try again.");
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        }
+
+        init();
     </script>
 </body>
 </html>

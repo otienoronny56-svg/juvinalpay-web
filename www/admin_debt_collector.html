@@ -7,109 +7,166 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: #f8fafc; margin: 0; display: flex; min-height: 100vh; overflow-x: hidden; }
-        aside.master-sidebar { width: 18rem !important; height: 100vh; position: fixed; left: 0; top: 0; background-color: #020617; border-right: 1px solid #1e293b; display: flex; flex-direction: column; padding: 1.5rem; z-index: 50; }
-        .nav-item { display: flex; align-items: center; gap: 1rem; padding: 0.875rem 1.25rem; font-size: 0.875rem; font-weight: 700; color: #94a3b8; border-radius: 1rem; transition: all 0.2s; text-decoration: none; margin-bottom: 0.25rem; white-space: nowrap; }
-        .nav-item:hover { background: rgba(255, 255, 255, 0.05); color: #ffffff; }
-        .nav-item.active { background: #4f46e5; color: #ffffff; box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4); }
-        main.dashboard-container { flex: 1; margin-left: 18rem; padding: 2.5rem; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .nav-item { transition: all 0.2s ease-in-out; }
+        .nav-item:hover { background-color: rgba(30, 41, 59, 0.5); transform: translateX(4px); color: white; }
+        .nav-item.active { background-color: #4f46e5; color: white; box-shadow: 0 4px 20px rgba(79, 70, 229, 0.3); }
     </style>
 </head>
-<body>
+<body class="flex h-screen overflow-hidden text-slate-100">
 
-    <aside class="master-sidebar">
-        <div class="mb-10 px-2"><h1 class="text-2xl font-extrabold italic">JuvinalPay<span class="text-indigo-500">.</span></h1></div>
-        <nav class="flex-1">
-            <a href="admin_finance.html" class="nav-item">📊 Financial Command</a>
-            <a href="admin_members.html" class="nav-item">👥 Member Capital</a>
-            <a href="admin_loans.html" class="nav-item">💰 Credit Portfolio</a>
-            <a href="admin_debt_collector.html" class="nav-item active">🚨 Collections HQ</a>
-            <a href="admin_transactions.html" class="nav-item">📜 Universal Ledger</a>
-            <a href="admin_settings.html" class="nav-item">⚙️ Global Rules</a>
+    <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col z-20 shrink-0">
+        <div class="p-8 pb-4">
+            <h1 class="text-2xl font-extrabold tracking-tight text-white italic flex items-center gap-2">
+                JuvinalPay<span class="text-indigo-500">.</span>
+            </h1>
+            <p class="text-xs text-slate-500 font-bold mt-1 tracking-widest uppercase">Admin Workspace</p>
+        </div>
+        <nav class="flex-1 px-4 space-y-1 overflow-y-auto no-scrollbar">
+            <a href="admin_dashboard.html" class="nav-item flex items-center gap-3 px-4 py-3.5 text-xs font-bold text-slate-400 rounded-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm4 0h2v-6H7v6zm4 0h2v-10h-2v10zm4 0h2v-4h-2v4zm4 0h2v-8h-2v8z"/></svg> Dashboard</a>
+            <a href="admin_finance.html" class="nav-item flex items-center gap-3 px-4 py-3.5 text-xs font-bold text-slate-400 rounded-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/></svg> Financial HQ</a>
+            <a href="admin_members.html" class="nav-item flex items-center gap-3 px-4 py-3.5 text-xs font-bold text-slate-400 rounded-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87M16 3.13a4 4 0 010 7.75M8 3.13a4 4 0 000 7.75"/></svg> Member Capital</a>
+            <a href="admin_loans.html" class="nav-item flex items-center gap-3 px-4 py-3.5 text-xs font-bold text-slate-400 rounded-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 10c-4.41 0-8-1.79-8-4V6c0-2.21 3.59-4 8-4s8 1.79 8 4v8c0 2.21-3.59 4-8 4z"/></svg> Credit Portfolio</a>
+            <a href="admin_debt_collector.html" class="nav-item active flex items-center gap-3 px-4 py-3.5 text-xs font-bold rounded-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18.364 5.636l-1.414 1.414A9 9 0 105.636 18.364l1.414-1.414A7 7 0 1118.364 5.636z"/></svg> Collections HQ</a>
+            <a href="admin_transactions.html" class="nav-item flex items-center gap-3 px-4 py-3.5 text-xs font-bold text-slate-400 rounded-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg> Universal Ledger</a>
+            <a href="admin_settings.html" class="nav-item flex items-center gap-3 px-4 py-3.5 text-xs font-bold text-slate-400 rounded-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 20c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg> Global Rules</a>
         </nav>
-        <button onclick="handleLogout()" class="nav-item text-rose-500 mt-auto border border-rose-500/20">🚪 Logout Session</button>
+        <div class="p-4 border-t border-slate-800">
+            <button onclick="handleLogout()" class="w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all"><span class="text-lg">🚪</span> Logout Session</button>
+        </div>
     </aside>
 
-    <main class="dashboard-container">
-        <header class="flex justify-between items-center mb-10">
+    <main class="flex-1 flex flex-col relative overflow-hidden bg-slate-900">
+        
+        <header class="h-20 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 flex justify-between items-center px-8 sticky top-0 z-10">
             <div>
-                <h2 class="text-3xl font-extrabold tracking-tight">Collections HQ</h2>
-                <p class="text-slate-400 text-sm mt-1">Live Daraja Integration Active.</p>
+                <h2 class="text-xl font-bold text-white text-rose-500">Debt Recovery</h2>
+                <p class="text-xs text-slate-400">Manage Overdue Accounts & Risks</p>
             </div>
-            <button onclick="loadCollections()" class="bg-rose-600/10 text-rose-400 text-[10px] font-bold px-4 py-2 rounded-xl border border-rose-600/20">FORCE REFRESH</button>
+            
+            <div class="bg-rose-500/10 border border-rose-500/20 px-4 py-2 rounded-xl">
+                <p class="text-[10px] text-rose-400 font-bold uppercase tracking-widest">Total At Risk</p>
+                <p class="text-lg font-black text-white" id="totalRisk">Checking...</p>
+            </div>
         </header>
 
-        <div class="bg-slate-900/50 border border-slate-800 rounded-[32px] overflow-hidden shadow-2xl">
-            <table class="w-full text-left">
-                <thead class="bg-slate-900 border-b border-slate-800">
-                    <tr>
-                        <th class="p-6 text-[10px] font-bold text-slate-500 uppercase">Debtor</th>
-                        <th class="p-6 text-[10px] font-bold text-slate-500 uppercase">Balance</th>
-                        <th class="p-6 text-[10px] font-bold text-slate-500 uppercase">Status</th>
-                        <th class="p-6 text-[10px] font-bold text-slate-500 uppercase text-right">M-Pesa Action</th>
-                    </tr>
-                </thead>
-                <tbody id="collectionsBody"></tbody>
-            </table>
+        <div class="flex-1 overflow-y-auto px-8 py-8 scrollbar-hide">
+            <div class="border border-slate-700 rounded-2xl overflow-hidden bg-slate-800/20 backdrop-blur-sm">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-800/80 text-slate-400 text-[10px] uppercase font-bold tracking-widest sticky top-0 z-10 backdrop-blur-md">
+                        <tr>
+                            <th class="p-5 border-b border-slate-700">Defaulter</th>
+                            <th class="p-5 border-b border-slate-700">Debt Exposure</th>
+                            <th class="p-5 border-b border-slate-700">Timeline</th>
+                            <th class="p-5 border-b border-slate-700">Risk Level</th>
+                            <th class="p-5 border-b border-slate-700 text-right">Recovery Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="riskTableBody" class="text-sm font-medium text-slate-300 divide-y divide-slate-700/50">
+                        </tbody>
+                </table>
+                
+                <div id="emptyState" class="hidden flex flex-col items-center justify-center py-20 opacity-50">
+                    <div class="text-5xl mb-4">✅</div>
+                    <p class="text-slate-400 font-bold">Clean Sheet! No overdue loans.</p>
+                </div>
+            </div>
         </div>
     </main>
 
     <script>
-        async function loadCollections() {
-            const { data, error } = await window.supabaseClient.from('late_loans_analysis').select('*');
-            if (error) return console.error(error.message);
-
-            const body = document.getElementById('collectionsBody');
-            body.innerHTML = data.map(loan => `
-                <tr class="border-b border-slate-800/50 hover:bg-white/5 transition-all">
-                    <td class="p-6">
-                        <p class="font-bold text-slate-100">${loan.full_name}</p>
-                        <p class="text-[10px] text-slate-500 font-mono tracking-wider">${loan.phone_number}</p>
-                    </td>
-                    <td class="p-6">
-                        <p class="text-sm font-extrabold text-white">KES ${loan.outstanding_balance.toLocaleString()}</p>
-                    </td>
-                    <td class="p-6">
-                        <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase bg-slate-800 text-slate-400">
-                           ${loan.days_overdue > 0 ? loan.days_overdue + ' DAYS LATE' : 'CURRENT'}
-                        </span>
-                    </td>
-                    <td class="p-6 text-right">
-                        <button onclick="initiateMpesaPayment('${loan.phone_number}', ${loan.outstanding_balance}, '${loan.full_name}')" 
-                            class="text-[9px] font-black px-6 py-3 bg-emerald-600 text-white rounded-xl hover:bg-emerald-500 hover:scale-105 transition-all shadow-lg shadow-emerald-900/40 flex items-center gap-2 ml-auto">
-                            <span>📲</span> STK PUSH
-                        </button>
-                    </td>
-                </tr>`).join('');
+        async function init() {
+            if (!window.supabaseClient) return;
+            await fetchRisks();
         }
 
-        async function initiateMpesaPayment(phone, balance, name) {
-            const amount = prompt(`Trigger M-Pesa Request for ${name} (${phone})\n\nEnter Amount to Deduct:`, Math.ceil(balance));
-            if (!amount) return;
+        async function fetchRisks() {
+            const tbody = document.getElementById('riskTableBody');
+            tbody.innerHTML = '<tr><td colspan="5" class="p-12 text-center text-slate-500 animate-pulse font-mono text-xs">ANALYZING PORTFOLIO...</td></tr>';
 
-            let cleanPhone = phone.replace(/\D/g, ''); 
-            if (cleanPhone.startsWith('0')) cleanPhone = '254' + cleanPhone.substring(1);
+            // 1. Fetch Loans that are 'overdue' OR 'active' but past due date
+            const { data: loans, error } = await window.supabaseClient
+                .from('sacco_loans')
+                .select('*, profiles(full_name, phone_number)')
+                .or('loan_status.eq.overdue,and(loan_status.eq.active,due_date.lt.now())')
+                .order('due_date', { ascending: true }); // Oldest first (Highest Risk)
 
-            alert(`Sending M-Pesa Prompt to ${cleanPhone}...`);
+            if (error) return console.error(error);
 
-            // CALL EXISTING EDGE FUNCTION
-            // We specifically send 'depositType': 'LoanRepayment' to match your mpesa-callback logic
-            const { data, error } = await window.supabaseClient.functions.invoke('stk-push', {
-                body: { 
-                    phone: cleanPhone, 
-                    amount: parseInt(amount), 
-                    depositType: 'LoanRepayment' 
-                }
-            });
-
-            if (error) {
-                alert("STK Push Failed: " + error.message);
-            } else {
-                alert(`✅ SUCCESS: Check ${name}'s phone for the PIN prompt.`);
-                console.log("Safaricom Response:", data);
+            if (!loans || loans.length === 0) {
+                tbody.innerHTML = '';
+                document.getElementById('emptyState').classList.remove('hidden');
+                document.getElementById('totalRisk').innerText = "KES 0";
+                return;
             }
+
+            // Calculate Total Risk
+            const totalRiskVal = loans.reduce((sum, l) => sum + (l.total_repayment || 0), 0);
+            document.getElementById('totalRisk').innerText = `KES ${totalRiskVal.toLocaleString()}`;
+
+            tbody.innerHTML = '';
+            
+            loans.forEach(loan => {
+                // Risk Logic
+                const dueDate = new Date(loan.due_date);
+                const now = new Date();
+                const diffTime = Math.abs(now - dueDate);
+                const daysOverdue = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+                
+                let riskBadge = '';
+                if (daysOverdue > 30) {
+                    riskBadge = `<span class="bg-rose-500/20 text-rose-500 border border-rose-500/30 px-2 py-1 rounded text-[10px] font-black uppercase">CRITICAL (${daysOverdue} Days)</span>`;
+                } else {
+                    riskBadge = `<span class="bg-amber-500/20 text-amber-500 border border-amber-500/30 px-2 py-1 rounded text-[10px] font-bold uppercase">WARNING (${daysOverdue} Days)</span>`;
+                }
+
+                // Phone Formatting for WhatsApp
+                let phone = loan.profiles?.phone_number || '';
+                let waLink = '#';
+                if(phone) {
+                    let cleanPhone = phone.replace(/\D/g, '');
+                    if(cleanPhone.startsWith('0')) cleanPhone = '254' + cleanPhone.substring(1);
+                    waLink = `https://wa.me/${cleanPhone}?text=Hello ${loan.profiles?.full_name}, this is JuvinalPay. Your loan of KES ${loan.amount} is overdue by ${daysOverdue} days. Please pay immediately to avoid penalties.`;
+                }
+
+                const row = document.createElement('tr');
+                row.className = "hover:bg-rose-900/10 transition-colors group";
+                row.innerHTML = `
+                    <td class="p-5">
+                        <div class="flex items-center gap-3">
+                            <div class="h-10 w-10 bg-rose-900/50 rounded-full flex items-center justify-center text-sm font-bold text-rose-400">
+                                !
+                            </div>
+                            <div>
+                                <p class="font-bold text-white text-sm">${loan.profiles?.full_name || 'Unknown'}</p>
+                                <p class="text-[11px] text-slate-500 font-mono tracking-wide">${loan.profiles?.phone_number}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="p-5">
+                        <p class="font-extrabold text-rose-400 text-sm">KES ${loan.total_repayment.toLocaleString()}</p>
+                        <p class="text-[11px] text-slate-500">Principal: ${loan.amount.toLocaleString()}</p>
+                    </td>
+                    <td class="p-5 text-xs text-slate-400">
+                        <p>Due: ${dueDate.toLocaleDateString()}</p>
+                    </td>
+                    <td class="p-5">
+                        ${riskBadge}
+                    </td>
+                    <td class="p-5 text-right flex justify-end gap-2">
+                        <a href="${waLink}" target="_blank" class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg shadow-lg text-xs font-bold flex items-center gap-1">
+                            <span>💬</span> WhatsApp
+                        </a>
+                        <a href="tel:${loan.profiles?.phone_number}" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-lg shadow-lg text-xs font-bold flex items-center gap-1">
+                            <span>📞</span> Call
+                        </a>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
         }
 
         async function handleLogout() {
@@ -117,7 +174,7 @@
             window.location.href = "login.html";
         }
 
-        loadCollections();
+        init();
     </script>
 </body>
 </html>

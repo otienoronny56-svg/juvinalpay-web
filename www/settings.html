@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JuvinalPay | Settings</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F8FAFC; transition: background 0.3s; }
+        body.dark { background-color: #0f172a; color: #f8fafc; }
+        body.dark .bg-white { background-color: #1e293b; border-color: #334155; color: white; }
+        body.dark .text-slate-900 { color: white; }
+        body.dark .text-slate-800 { color: #cbd5e1; }
+    </style>
+</head>
+<body class="pb-24">
+
+    <header class="pt-8 px-6 mb-6">
+        <div class="flex items-center gap-4">
+            <button onclick="window.history.back()" class="h-10 w-10 bg-white rounded-full flex items-center justify-center shadow-sm border border-slate-100 text-slate-600">←</button>
+            <h1 class="text-2xl font-extrabold text-slate-900">Settings</h1>
+        </div>
+    </header>
+
+    <main class="px-6 space-y-6">
+        
+        <section class="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Appearance</h3>
+            <div class="flex justify-between items-center">
+                <span class="font-bold text-slate-800 text-sm">Dark Mode</span>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="themeToggle" class="sr-only peer" onchange="toggleTheme()">
+                    <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                </label>
+            </div>
+        </section>
+
+        <section class="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Security</h3>
+            <button onclick="resetPassword()" class="w-full flex justify-between items-center py-2">
+                <span class="font-bold text-slate-800 text-sm">Reset Password</span>
+                <span class="text-indigo-600 font-bold text-xs">Send Email →</span>
+            </button>
+        </section>
+
+        <section class="bg-white p-6 rounded-[32px] border border-slate-100 shadow-sm">
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Legal</h3>
+            <a href="terms.html" class="flex justify-between items-center py-2 border-b border-slate-50">
+                <span class="font-bold text-slate-800 text-sm">Terms & Conditions</span>
+                <span class="text-slate-400 text-xs">→</span>
+            </a>
+            <a href="privacy.html" class="flex justify-between items-center py-2 pt-4">
+                <span class="font-bold text-slate-800 text-sm">Privacy Policy</span>
+                <span class="text-slate-400 text-xs">→</span>
+            </a>
+        </section>
+
+        <button onclick="handleLogout()" class="w-full py-4 text-rose-500 font-bold bg-rose-50 rounded-2xl border border-rose-100">Log Out</button>
+
+    </main>
+
+    <script>
+        // Theme Logic
+        function toggleTheme() {
+            const isDark = document.getElementById('themeToggle').checked;
+            if (isDark) {
+                document.body.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.body.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            }
+            // Force storage event for other tabs/windows
+            window.dispatchEvent(new Event('storage'));
+        }
+
+        // Init Theme
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark');
+            document.getElementById('themeToggle').checked = true;
+        }
+
+        // Reset Password
+        async function resetPassword() {
+            if(!confirm("Send password reset link to your email?")) return;
+            
+            const { data: { user } } = await window.supabaseClient.auth.getUser();
+            const { error } = await window.supabaseClient.auth.resetPasswordForEmail(user.email, {
+                redirectTo: window.location.origin + '/reset-password.html',
+            });
+            
+            if (error) alert(error.message);
+            else alert("Link Sent! Check your email inbox.");
+        }
+
+        async function handleLogout() {
+            await window.supabaseClient.auth.signOut();
+            window.location.href = "login.html";
+        }
+    </script>
+</body>
+</html>

@@ -1,129 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+            <!-- Font Awesome for modern icons -->
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <link rel="icon" type="image/png" href="logo.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JuvinalPay | Secure Access</title>
+    <title>JuvinalPay | Access</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
-        .login-card { @apply w-full max-w-md bg-white rounded-[40px] shadow-2xl p-10 border border-slate-100; }
-    </style>
+    <style>@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap'); body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
 </head>
-<body class="flex items-center justify-center min-h-screen p-6 bg-slate-50">
+<body class="flex items-center justify-center min-h-screen bg-slate-50 p-6">
 
-    <div class="login-card">
+    <div class="w-full max-w-md bg-white rounded-[40px] shadow-2xl p-10 border border-slate-100">
         <div class="text-center mb-10">
-            <h1 class="text-3xl font-extrabold italic tracking-tight text-slate-900">JuvinalPay<span class="text-indigo-600">.</span></h1>
-            <p class="text-slate-400 text-sm mt-2 font-medium">Institutional Login Portal</p>
+            <img src="logo.png" alt="JuvinalPay" class="h-24 mx-auto mb-4 object-contain">
+            <p class="text-slate-500 font-medium">Together we Grow</p>
         </div>
 
         <div class="space-y-5">
-            <div>
-                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1 block mb-2">Institutional ID (Email)</label>
-                <input type="email" id="email" placeholder="name@domain.com" 
-                    class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm font-semibold">
-            </div>
-
-            <div>
-                <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest ml-1 block mb-2">Access Key (Password)</label>
-                <input type="password" id="password" placeholder="••••••••" 
-                    class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all text-sm font-semibold">
-            </div>
-
-            <button onclick="handleLogin()" id="loginBtn"
-                class="w-full bg-slate-900 hover:bg-black text-white font-bold py-5 rounded-[24px] shadow-xl active:scale-95 transition-all mt-4">
-                Verify & Enter
+            <input type="email" id="email" placeholder="Email Address" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-sm focus:border-indigo-500">
+            <input type="password" id="password" placeholder="Password" class="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-semibold text-sm focus:border-indigo-500">
+            
+            <button onclick="handleLogin()" id="loginBtn" class="w-full bg-slate-900 text-white font-bold py-5 rounded-[24px] shadow-xl active:scale-95 transition-all">
+                Enter Portal
             </button>
         </div>
-
-        <p class="text-center text-xs text-slate-400 mt-10 font-medium">
-            New to the cooperative? <a href="register.html" class="text-indigo-600 font-bold hover:underline">Apply for Membership</a>
-        </p>
+        <p class="text-center text-xs text-slate-400 mt-10">No account? <a href="register.html" class="text-indigo-600 font-bold">Register</a></p>
     </div>
 
     <script>
-        // 1. Session Guard: Auto-redirect if already logged in
-        async function checkSession() {
-            if (!window.supabaseClient) return;
+        // Check session on load
+        window.onload = async () => {
             const { data: { session } } = await window.supabaseClient.auth.getSession();
-            if (session) {
-                console.log("Session found, initiating redirect logic...");
-                redirectBasedOnRole(session.user.id);
-            }
-        }
+            if (session) routeUser(session.user.id);
+        };
 
-        // 2. High-Intelligence Redirect Logic
-        async function redirectBasedOnRole(userId) {
-            console.log("Fetching profile for ID:", userId);
-
-            // Use maybeSingle to prevent 406 errors if row is missing
-            const { data: profile, error } = await window.supabaseClient
-                .from('profiles')
-                .select('role, membership_status')
-                .eq('id', userId)
-                .maybeSingle(); 
-
-            if (error) {
-                console.error("Database Fetch Error:", error);
-                alert("System Error: Unable to verify account profile. Please refresh.");
-                return;
-            }
-
-            if (!profile) {
-                console.error("Profile record missing for Auth User.");
-                alert("Account error: Your profile record was not found. Contact Admin.");
-                return;
-            }
-
-            console.log("Profile Found. Role:", profile.role, "Status:", profile.membership_status);
-
-            // Redirect Logic based on role and status
-            if (profile.role === 'admin') {
-                window.location.href = "admin_finance.html";
-            } 
-            else if (profile.membership_status === 'pending_payment') {
-                window.location.href = "payment.html"; // Send to membership payment page
-            } 
-            else {
-                window.location.href = "dashboard.html"; // Standard Member Home
-            }
-        }
-
-        // 3. Login Handler
         async function handleLogin() {
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const btn = document.getElementById('loginBtn');
 
-            if (!email || !password) {
-                alert("Credentials required.");
-                return;
-            }
+            btn.disabled = true; btn.innerText = "Verifying...";
 
-            btn.disabled = true;
-            btn.innerText = "Authenticating...";
-
-            const { data, error } = await window.supabaseClient.auth.signInWithPassword({
-                email: email,
-                password: password
-            });
+            const { data, error } = await window.supabaseClient.auth.signInWithPassword({ email, password });
 
             if (error) {
-                console.error("Login Error:", error.message);
-                alert("Login Failed: " + error.message);
-                btn.disabled = false;
-                btn.innerText = "Verify & Enter";
+                alert(error.message);
+                btn.disabled = false; btn.innerText = "Enter Portal";
             } else {
-                console.log("Auth Success. Checking role...");
-                redirectBasedOnRole(data.user.id);
+                routeUser(data.user.id);
             }
         }
 
-        checkSession();
+        async function routeUser(userId) {
+            // Fetch Profile & Status
+            const { data: profile } = await window.supabaseClient
+                .from('profiles')
+                .select('role, membership_status')
+                .eq('id', userId)
+                .single();
+
+            if (!profile) return alert("Profile not found.");
+
+            // ROUTING LOGIC
+            if (profile.role === 'admin') {
+                window.location.href = "admin_finance.html";
+            } 
+            // If they registered but haven't paid the fee yet
+            else if (profile.membership_status === 'pending_payment' || !profile.membership_status) {
+                window.location.href = "payment.html?mode=onboarding"; 
+            }
+            // If paid but waiting for admin
+            else if (profile.membership_status === 'pending_approval') {
+                window.location.href = "success.html";
+            }
+            // Fully Active
+            else {
+                window.location.href = "dashboard.html";
+            }
+        }
     </script>
+    <nav class="fixed bottom-0 w-full bg-white border-t border-slate-100 pb-4 pt-2 px-6 flex justify-between z-30 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        <a href="dashboard.html" class="flex flex-col items-center gap-1 p-2 text-slate-400 hover:text-slate-900 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                <path d="M11.47 3.84a.75.75 0 011.06 0l8.635 8.635a.75.75 0 11-1.06 1.06l-.375-.375v4.425a.75.75 0 01-.75.75H16.5V13.5a1.5 1.5 0 00-1.5-1.5h-6a1.5 1.5 0 00-1.5 1.5v4.885H4.125a.75.75 0 01-.75-.75V13.16l-.375.375a.75.75 0 11-1.06-1.06L11.47 3.84z" />
+            </svg>
+            <span class="text-[10px] font-bold">Home</span>
+        </a>
+        <a href="loans.html" class="flex flex-col items-center gap-1 p-2 text-slate-400 hover:text-slate-900 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                <path fill-rule="evenodd" d="M7.5 6v.75H5.513c-.96 0-1.764.724-1.865 1.679l-1.263 12A1.875 1.875 0 004.25 22.5h15.5a1.875 1.875 0 001.865-2.071l-1.263-12a1.875 1.875 0 00-1.865-1.679H16.5V6a4.5 4.5 0 10-9 0zM12 3a3 3 0 00-3 3v.75h6V6a3 3 0 00-3-3zm-3 8.25a3 3 0 106 0v-.75a.75.75 0 011.5 0v.75a4.5 4.5 0 11-9 0v-.75a.75.75 0 011.5 0v.75z" clip-rule="evenodd" />
+            </svg>
+            <span class="text-[10px] font-bold">Loans</span>
+        </a>
+        <a href="activity.html" class="flex flex-col items-center gap-1 p-2 text-slate-400 hover:text-slate-900 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                <path fill-rule="evenodd" d="M12 2.25a9.75 9.75 0 100 19.5 9.75 9.75 0 000-19.5zM12 18a6 6 0 110-12 6 6 0 010 12zm.75-9.75a.75.75 0 00-1.5 0v3.19l2.72 1.63a.75.75 0 10.76-1.29l-2.23-1.34V8.25z" clip-rule="evenodd" />
+            </svg>
+            <span class="text-[10px] font-bold">Activity</span>
+        </a>
+        <a href="profile.html" class="flex flex-col items-center gap-1 p-2 text-slate-400 hover:text-slate-900 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6">
+                <path fill-rule="evenodd" d="M7.5 6a4.5 4.5 0 119 0 4.5 4.5 0 01-9 0zM3.751 20.105a8.25 8.25 0 0116.498 0 .75.75 0 01-.437.695A18.683 18.683 0 0112 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 01-.437-.695z" clip-rule="evenodd" />
+            </svg>
+            <span class="text-[10px] font-bold">Profile</span>
+        </a>
+    </nav>
 </body>
 </html>

@@ -7,142 +7,429 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: #f8fafc; margin: 0; display: flex; min-height: 100vh; overflow-x: hidden; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .nav-item { transition: all 0.2s ease-in-out; }
+        .nav-item:hover { background-color: rgba(30, 41, 59, 0.5); transform: translateX(4px); color: white; }
+        .nav-item.active { background-color: #4f46e5; color: white; box-shadow: 0 4px 20px rgba(79, 70, 229, 0.3); }
         
-        aside.master-sidebar { width: 18rem !important; height: 100vh; position: fixed; left: 0; top: 0; background-color: #020617; border-right: 1px solid #1e293b; display: flex; flex-direction: column; padding: 1.5rem; z-index: 50; }
-        .nav-item { display: flex; align-items: center; gap: 1rem; padding: 0.875rem 1.25rem; font-size: 0.875rem; font-weight: 700; color: #94a3b8; border-radius: 1rem; transition: all 0.2s; text-decoration: none; margin-bottom: 0.25rem; white-space: nowrap; }
-        .nav-item:hover { background: rgba(255, 255, 255, 0.05); color: #ffffff; }
-        .nav-item.active { background: #4f46e5; color: #ffffff; box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4); }
-        main.dashboard-container { flex: 1; margin-left: 18rem; padding: 2.5rem; }
+        /* Drawer Slide Effect */
+        #memberDrawer { transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .drawer-open { transform: translateX(0) !important; }
+        .drawer-closed { transform: translateX(100%) !important; }
     </style>
 </head>
-<body>
+<body class="flex h-screen overflow-hidden text-slate-100">
 
-    <aside class="master-sidebar">
-        <div class="mb-10 px-2"><h1 class="text-2xl font-extrabold italic">JuvinalPay<span class="text-indigo-500">.</span></h1></div>
-        <nav class="flex-1">
-            <a href="admin_finance.html" class="nav-item">📊 Financial Command</a>
-            <a href="admin_members.html" class="nav-item active">👥 Member Capital</a>
-            <a href="admin_loans.html" class="nav-item">💰 Credit Portfolio</a>
-            <a href="admin_debt_collector.html" class="nav-item">🚨 Collections HQ</a>
-            <a href="admin_transactions.html" class="nav-item">📜 Universal Ledger</a>
-            <a href="admin_settings.html" class="nav-item">⚙️ Global Rules</a>
+    <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col z-20 shrink-0">
+        <div class="p-8 pb-4">
+            <h1 class="text-2xl font-extrabold tracking-tight text-white italic flex items-center gap-2">
+                JuvinalPay<span class="text-indigo-500">.</span>
+            </h1>
+            <p class="text-xs text-slate-500 font-bold mt-1 tracking-widest uppercase">Admin Workspace</p>
+        </div>
+        <nav class="flex-1 px-4 space-y-1 overflow-y-auto no-scrollbar">
+            <a href="admin_dashboard.html" class="nav-item flex items-center gap-3 px-4 py-3.5 text-xs font-bold text-slate-400 rounded-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm4 0h2v-6H7v6zm4 0h2v-10h-2v10zm4 0h2v-4h-2v4zm4 0h2v-8h-2v8z"/></svg> Dashboard</a>
+            <a href="admin_finance.html" class="nav-item flex items-center gap-3 px-4 py-3.5 text-xs font-bold text-slate-400 rounded-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/></svg> Financial HQ</a>
+            <a href="admin_members.html" class="nav-item active flex items-center gap-3 px-4 py-3.5 text-xs font-bold rounded-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87M16 3.13a4 4 0 010 7.75M8 3.13a4 4 0 000 7.75"/></svg> Member Capital</a>
+            <a href="admin_loans.html" class="nav-item flex items-center gap-3 px-4 py-3.5 text-xs font-bold text-slate-400 rounded-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 10c-4.41 0-8-1.79-8-4V6c0-2.21 3.59-4 8-4s8 1.79 8 4v8c0 2.21-3.59 4-8 4z"/></svg> Credit Portfolio</a>
+            <a href="admin_debt_collector.html" class="nav-item flex items-center gap-3 px-4 py-3.5 text-xs font-bold text-slate-400 rounded-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18.364 5.636l-1.414 1.414A9 9 0 105.636 18.364l1.414-1.414A7 7 0 1118.364 5.636z"/></svg> Collections HQ</a>
+            <a href="admin_transactions.html" class="nav-item flex items-center gap-3 px-4 py-3.5 text-xs font-bold text-slate-400 rounded-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg> Universal Ledger</a>
+            <a href="admin_settings.html" class="nav-item flex items-center gap-3 px-4 py-3.5 text-xs font-bold text-slate-400 rounded-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 20c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg> Global Rules</a>
         </nav>
-        <button onclick="handleLogout()" class="nav-item text-rose-500 mt-auto border border-rose-500/20">🚪 Logout Session</button>
+        <div class="p-4 border-t border-slate-800">
+            <button onclick="handleLogout()" class="w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all"><span class="text-lg">🚪</span> Logout Session</button>
+        </div>
     </aside>
 
-    <main class="dashboard-container">
-        <header class="flex justify-between items-center mb-10">
+    <main class="flex-1 flex flex-col relative overflow-hidden bg-slate-900">
+        
+        <header class="h-20 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 flex justify-between items-center px-8 sticky top-0 z-10">
             <div>
-                <h2 class="text-3xl font-extrabold tracking-tight">Member Directory</h2>
-                <p class="text-slate-400 text-sm mt-1">Institutional surveillance and member activation.</p>
+                <h2 class="text-xl font-bold text-white">Member Directory</h2>
+                <p class="text-xs text-slate-400">Manage KYC, Savings & Account Status</p>
             </div>
-            <button onclick="loadMembers()" class="bg-indigo-600/10 text-indigo-400 text-[10px] font-bold px-4 py-2 rounded-xl border border-indigo-600/20">FORCE REFRESH</button>
+            
+            <div class="relative w-96 group">
+                <input type="text" id="searchInput" onkeyup="renderTable()" placeholder="Find by Name, Phone, ID..." 
+                    class="w-full bg-slate-800 border border-slate-700 text-xs font-bold text-white px-4 py-3 pl-10 rounded-xl outline-none focus:border-indigo-500 focus:bg-slate-800 transition-all placeholder:text-slate-500">
+                <span class="absolute left-3 top-3 text-slate-500 group-focus-within:text-indigo-500 transition-colors">🔍</span>
+            </div>
         </header>
 
-        <div class="bg-slate-900/50 border border-slate-800 rounded-[32px] overflow-hidden shadow-2xl">
-            <table class="w-full text-left">
-                <thead class="bg-slate-900 border-b border-slate-800">
-                    <tr>
-                        <th class="p-6 text-[10px] font-bold text-slate-500 uppercase">Identity</th>
-                        <th class="p-6 text-[10px] font-bold text-slate-500 uppercase">Membership</th>
-                        <th class="p-6 text-[10px] font-bold text-slate-500 uppercase text-right">Intervention</th>
-                    </tr>
-                </thead>
-                <tbody id="membersBody"></tbody>
-            </table>
+        <div class="px-8 pt-8 grid grid-cols-4 gap-3">
+            <div class="bg-slate-800/50 border border-slate-700 p-2 rounded-xl flex items-center gap-2 min-w-0">
+                <div class="bg-indigo-500/10 p-3 rounded-xl text-indigo-400 text-xl">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87M16 3.13a4 4 0 010 7.75M8 3.13a4 4 0 000 7.75"/></svg>
+                </div>
+                <div>
+                    <p class="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Total Members</p>
+                    <h3 class="text-xl font-black text-white" id="stat-total">...</h3>
+                </div>
+            </div>
+            <div class="bg-slate-800/50 border border-slate-700 p-2 rounded-xl flex items-center gap-2 min-w-0">
+                <div class="bg-emerald-500/10 p-3 rounded-xl text-emerald-400 text-xl">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 10c-4.41 0-8-1.79-8-4V6c0-2.21 3.59-4 8-4s8 1.79 8 4v8c0 2.21-3.59 4-8 4z"/></svg>
+                </div>
+                <div>
+                    <p class="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Total Savings</p>
+                    <h3 class="text-xl font-black text-white" id="stat-savings">...</h3>
+                </div>
+            </div>
+            <div class="bg-slate-800/50 border border-slate-700 p-2 rounded-xl flex items-center gap-2 min-w-0">
+                <div class="bg-indigo-500/10 p-3 rounded-xl text-indigo-400 text-xl">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 3v18m9-9H3"/></svg>
+                </div>
+                <div>
+                    <p class="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Total Capital Shares</p>
+                    <h3 class="text-xl font-black text-white" id="stat-shares">...</h3>
+                </div>
+            </div>
+            <div class="bg-slate-800/50 border border-slate-700 p-2 rounded-xl flex items-center gap-2 min-w-0">
+                <div class="bg-rose-500/10 p-3 rounded-xl text-rose-400 text-xl">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18.364 5.636l-1.414 1.414A9 9 0 105.636 18.364l1.414-1.414A7 7 0 1118.364 5.636z"/></svg>
+                </div>
+                <div>
+                    <p class="text-[10px] uppercase font-bold text-slate-400 tracking-widest">Banned / Inactive</p>
+                    <h3 class="text-xl font-black text-white" id="stat-banned">...</h3>
+                </div>
+            </div>
+        </div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto px-8 py-8 scrollbar-hide">
+            <div class="border border-slate-700 rounded-2xl overflow-hidden bg-slate-800/20 backdrop-blur-sm">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-800/80 text-slate-400 text-[10px] uppercase font-bold tracking-widest sticky top-0 z-10 backdrop-blur-md">
+                        <tr>
+                            <th class="p-5 border-b border-slate-700">Member Profile</th>
+                            <th class="p-5 border-b border-slate-700">Location</th>
+                            <th class="p-5 border-b border-slate-700">Financials</th>
+                            <th class="p-5 border-b border-slate-700">KYC Status</th>
+                            <th class="p-5 border-b border-slate-700 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="membersTableBody" class="text-sm font-medium text-slate-300 divide-y divide-slate-700/50">
+                        </tbody>
+                </table>
+            </div>
         </div>
     </main>
 
-    <div id="dossierModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden flex items-center justify-center z-[100] p-6">
-        <div class="bg-slate-900 border border-slate-800 rounded-[40px] p-10 w-full max-w-lg shadow-2xl">
-            <h3 class="text-2xl font-bold mb-6 text-indigo-400">Institutional Dossier</h3>
-            <div id="dossierContent" class="space-y-4 text-sm border-t border-slate-800 pt-6"></div>
-            <button onclick="closeDossier()" class="mt-8 w-full py-4 bg-slate-800 text-white rounded-2xl font-bold">Dismiss</button>
+    <div id="drawerOverlay" onclick="closeDrawer()" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 hidden transition-opacity"></div>
+    <div id="memberDrawer" class="fixed top-0 right-0 h-full w-[450px] bg-slate-900 border-l border-slate-700 z-50 drawer-closed shadow-2xl flex flex-col">
+        
+        <div class="p-6 border-b border-slate-800 flex justify-between items-center bg-slate-900">
+            <h3 class="text-lg font-bold text-white">Member Profile</h3>
+            <button onclick="closeDrawer()" class="text-slate-400 hover:text-white">✕</button>
+        </div>
+
+        <div class="flex-1 overflow-y-auto p-6 space-y-6">
+            
+            <div class="text-center">
+                <img id="d-avatar" src="" class="w-24 h-24 rounded-full mx-auto border-4 border-slate-800 bg-slate-700 object-cover mb-4">
+                <h2 id="d-name" class="text-xl font-bold text-white">...</h2>
+                <p id="d-phone" class="text-sm text-indigo-400 font-mono">...</p>
+                <div class="mt-4 flex justify-center gap-2">
+                    <span id="d-status" class="px-3 py-1 rounded-full text-[10px] uppercase font-black bg-emerald-500/10 text-emerald-400">Active</span>
+                    <span id="d-joined" class="px-3 py-1 rounded-full text-[10px] uppercase font-bold bg-slate-800 text-slate-400">Joined ...</span>
+                </div>
+            </div>
+
+            <div class="bg-slate-800/50 p-6 rounded-2xl border border-slate-700">
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Financial Overview</h4>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-[10px] text-slate-500">Savings Balance</p>
+                        <p id="d-savings" class="text-lg font-black text-white">KES 0</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-slate-500">Loan Status</p>
+                        <p id="d-loan-status" class="text-lg font-black text-slate-300">None</p>
+                    </div>
+                <div class="col-span-2">
+                    <p class="text-[10px] text-slate-500">Share Capital</p>
+                    <p id="d-share-capital" class="text-lg font-black text-indigo-300">KES 0</p>
+                </div>
+                </div>
+            </div>
+
+            <div>
+                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">KYC Documents</h4>
+                <div id="d-docs-list" class="space-y-2">
+                    </div>
+            </div>
+        </div>
+
+        <div class="p-6 border-t border-slate-800 bg-slate-900 safe-area-pb">
+            <div class="flex flex-col gap-3">
+                <button id="btn-password-reset" onclick="sendPasswordReset()" class="w-full py-3 rounded-xl font-bold text-sm bg-indigo-900/20 text-indigo-400 border border-indigo-500/20 hover:bg-indigo-900/40 transition-all flex items-center gap-2 justify-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 15v2m0 0v2m0-2h2m-2 0h-2m6-6a6 6 0 11-12 0 6 6 0 0112 0z"/></svg>
+                    Send Password Reset
+                </button>
+                <button id="btn-whatsapp" onclick="sendWhatsAppMessage()" class="w-full py-3 rounded-xl font-bold text-sm bg-green-900/20 text-green-400 border border-green-500/20 hover:bg-green-900/40 transition-all flex items-center gap-2 justify-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M16.72 11.06a6.5 6.5 0 10-11.44 6.11L3 21l3.92-1.28a6.5 6.5 0 009.8-8.66z"/></svg>
+                    Message via WhatsApp
+                </button>
+                <button id="btn-inapp-message" onclick="sendInAppMessage()" class="w-full py-3 rounded-xl font-bold text-sm bg-blue-900/20 text-blue-400 border border-blue-500/20 hover:bg-blue-900/40 transition-all flex items-center gap-2 justify-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                    Send In-App Message
+                </button>
+                <button id="btn-ban" onclick="toggleBan()" class="w-full py-4 rounded-xl font-bold text-sm bg-rose-900/20 text-rose-500 border border-rose-500/20 hover:bg-rose-900/40 transition-all mt-2">
+                    🛑 Ban Member
+                </button>
+            </div>
         </div>
     </div>
 
     <script>
-        async function loadMembers() {
-            // Using the disabled RLS view to ensure you see everyone
-            const { data, error } = await window.supabaseClient.from('profiles').select('*').order('created_at', { ascending: false });
+        let allMembers = [];
+        let currentMemberId = null;
 
-            if (error) return console.error("Error:", error.message);
-
-            const body = document.getElementById('membersBody');
-            body.innerHTML = data.map(m => `
-                <tr class="border-b border-slate-800/50 hover:bg-white/5 transition-all">
-                    <td class="p-6">
-                        <p class="font-bold text-slate-100">${m.full_name || 'Anonymous'}</p>
-                        <p class="text-[10px] text-slate-500 font-mono">${m.phone_number}</p>
-                    </td>
-                    <td class="p-6">
-                        <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase ${m.membership_status === 'active' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-amber-500/10 text-amber-500'}">
-                            ${m.membership_status?.replace('_', ' ') || 'PENDING'}
-                        </span>
-                    </td>
-                    <td class="p-6 text-right space-x-2">
-                        ${m.membership_status !== 'active' ? 
-                            `<button onclick="approveMember('${m.id}', '${m.full_name}')" class="text-[9px] font-black px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">APPROVE</button>` : ''}
-                        <button onclick="viewDossier('${m.id}')" class="text-[9px] font-black px-4 py-2 border border-slate-700 rounded-lg">DOSSIER</button>
-                    </td>
-                </tr>
-            `).join('');
+        async function init() {
+            if (!window.supabaseClient) return;
+            await fetchMembers();
+            // Real-time listener for 'profiles' table
+            window.memberSubscription = window.supabaseClient
+                .channel('admin-members-channel')
+                .on(
+                    'postgres_changes',
+                    { event: '*', schema: 'public', table: 'profiles' },
+                    (payload) => {
+                        console.log('Change received!', payload);
+                        fetchMembers();
+                    }
+                )
+                .subscribe();
         }
 
-        async function approveMember(userId, name) {
-            if(!confirm(`APPROVE MEMBER: Grant institutional access to ${name}?`)) return;
-            
-            // 1. Update Status
-            const { error: profileError } = await window.supabaseClient
-                .from('profiles')
-                .update({ membership_status: 'active' })
-                .eq('id', userId);
+        async function fetchMembers() {
+            const tbody = document.getElementById('membersTableBody');
+            tbody.innerHTML = '<tr><td colspan="5" class="p-12 text-center text-slate-500 animate-pulse font-mono text-xs">LOADING REGISTRY...</td></tr>';
 
-            if (profileError) {
-                alert("Approval Failed: " + profileError.message);
+            // Fetch Profiles
+            const { data, error } = await window.supabaseClient
+                .from('profiles')
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) return console.error(error);
+            allMembers = data;
+
+
+            // Update Stats
+            document.getElementById('stat-total').innerText = allMembers.length;
+            const totalSavings = allMembers.reduce((sum, m) => sum + (m.savings_balance || 0), 0);
+            document.getElementById('stat-savings').innerText = `KES ${totalSavings.toLocaleString()}`;
+            const bannedCount = allMembers.filter(m => m.membership_status === 'banned').length;
+            document.getElementById('stat-banned').innerText = bannedCount;
+
+            // Fetch and update Total Capital Shares
+            let totalShares = 0;
+            try {
+                const { data: sharesData, error: sharesError } = await window.supabaseClient
+                    .from('share_capital')
+                    .select('amount');
+                if (!sharesError && sharesData) {
+                    totalShares = sharesData.reduce((sum, s) => sum + (s.amount || 0), 0);
+                }
+            } catch (e) { totalShares = 0; }
+            document.getElementById('stat-shares').innerText = `KES ${Number(totalShares).toLocaleString()}`;
+
+            renderTable();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('membersTableBody');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+
+            const filtered = allMembers.filter(m => 
+                (m.full_name || '').toLowerCase().includes(search) ||
+                (m.phone_number || '').includes(search) ||
+                (m.id_number || '').includes(search)
+            );
+
+            tbody.innerHTML = '';
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="p-12 text-center text-slate-500">No members found.</td></tr>';
                 return;
             }
 
-            // 2. Add Ledger Entry
-            // We do this manually now so it doesn't crash the approval
-            const { error: ledgerError } = await window.supabaseClient
-                .from('transactions')
-                .insert([{
-                    user_id: userId,
-                    amount: 100.00,
-                    transaction_type: 'membership_fee',
-                    description: 'Institutional Registration Fee',
-                    mpesa_reference: 'REG-' + Math.random().toString(36).substr(2, 9).toUpperCase()
-                }]);
+            filtered.forEach(m => {
+                const row = document.createElement('tr');
+                row.className = "hover:bg-slate-700/30 transition-colors group cursor-pointer";
+                row.onclick = (e) => { 
+                    // Prevent drawer open if clicking action button
+                    if(!e.target.closest('button')) openDrawer(m.id); 
+                };
 
-            if (ledgerError) {
-                console.warn("Ledger entry warning:", ledgerError.message);
-                // We don't alert here because the user IS approved, which is the important part
-            }
+                const isBanned = m.membership_status === 'banned';
+                const statusBadge = isBanned 
+                    ? '<span class="text-rose-500 bg-rose-500/10 px-2 py-1 rounded text-[10px] font-bold border border-rose-500/20">BANNED</span>'
+                    : '<span class="text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded text-[10px] font-bold border border-emerald-500/20">VERIFIED</span>';
 
-            alert("SUCCESS: Member Activated.");
-            loadMembers();
-        }
-
-        async function viewDossier(userId) {
-            const { data } = await window.supabaseClient.from('profiles').select('*').eq('id', userId).single();
-            if (data) {
-                document.getElementById('dossierContent').innerHTML = `
-                    <p class="text-slate-500 uppercase text-[10px]">Name: <span class="text-white font-bold ml-2">${data.full_name}</span></p>
-                    <p class="text-slate-500 uppercase text-[10px]">Phone: <span class="text-white font-bold ml-2">${data.phone_number}</span></p>
-                    <p class="text-slate-500 uppercase text-[10px]">ID: <span class="text-white font-bold ml-2">${data.id_number || '---'}</span></p>
+                row.innerHTML = `
+                    <td class="p-5">
+                        <div class="flex items-center gap-4">
+                            <img src="${m.avatar_url || 'https://via.placeholder.com/40'}" class="h-10 w-10 rounded-full bg-slate-700 object-cover border border-slate-600">
+                            <div>
+                                <p class="font-bold text-white text-sm">${m.full_name || 'Unknown'}</p>
+                                <p class="text-[11px] text-slate-500 font-mono tracking-wide">${m.phone_number}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="p-5">
+                        <p class="text-xs text-white font-bold">${m.city || '-'}</p>
+                        <p class="text-[11px] text-slate-500">${m.county || 'Kenya'}</p>
+                    </td>
+                    <td class="p-5">
+                        <p class="font-bold text-emerald-400 text-sm">KES ${(m.savings_balance || 0).toLocaleString()}</p>
+                        <p class="text-[11px] text-slate-500">Savings</p>
+                    </td>
+                    <td class="p-5">
+                        ${statusBadge}
+                    </td>
+                    <td class="p-5 text-right">
+                        <button onclick="openDrawer('${m.id}')" class="text-[10px] font-bold text-indigo-400 border border-indigo-500/30 px-3 py-1.5 rounded-lg hover:bg-indigo-500/10 transition-colors">
+                            View Profile
+                        </button>
+                    </td>
                 `;
-                document.getElementById('dossierModal').classList.remove('hidden');
+                tbody.appendChild(row);
+            });
+        }
+
+        // --- DRAWER LOGIC ---
+        async function openDrawer(userId) {
+            const member = allMembers.find(m => m.id === userId);
+            if (!member) return;
+            currentMemberId = userId;
+
+
+            // 1. Populate Basic Info
+            document.getElementById('d-name').innerText = member.full_name;
+            document.getElementById('d-phone').innerText = member.phone_number;
+            document.getElementById('d-avatar').src = member.avatar_url || 'https://via.placeholder.com/100';
+            document.getElementById('d-savings').innerText = `KES ${(member.savings_balance || 0).toLocaleString()}`;
+            document.getElementById('d-joined').innerText = new Date(member.created_at).toLocaleDateString();
+            // Fetch Share Capital
+            let shareCapital = 0;
+            try {
+                const { data: shares } = await window.supabaseClient
+                    .from('share_capital')
+                    .select('amount')
+                    .eq('user_id', userId)
+                    .maybeSingle();
+                shareCapital = shares ? shares.amount : 0;
+            } catch (e) { shareCapital = 0; }
+            document.getElementById('d-share-capital').innerText = `KES ${Number(shareCapital).toLocaleString()}`;
+
+            // 2. Setup Ban Button
+            const btnBan = document.getElementById('btn-ban');
+            if (member.membership_status === 'banned') {
+                btnBan.innerText = "✅ Unban Member";
+                btnBan.className = "w-full py-4 rounded-xl font-bold text-sm bg-emerald-900/20 text-emerald-500 border border-emerald-500/20 hover:bg-emerald-900/40 transition-all";
+            } else {
+                btnBan.innerText = "🛑 Ban Member";
+                btnBan.className = "w-full py-4 rounded-xl font-bold text-sm bg-rose-900/20 text-rose-500 border border-rose-500/20 hover:bg-rose-900/40 transition-all";
+            }
+
+            // 3. Fetch Active Loan (Quick Check)
+            const { data: loans } = await window.supabaseClient.from('sacco_loans').select('amount, loan_status').eq('user_id', userId).eq('loan_status', 'active').maybeSingle();
+            document.getElementById('d-loan-status').innerText = loans ? `Active: KES ${loans.amount.toLocaleString()}` : 'No Active Loans';
+
+            // 4. Fetch Documents
+            const { data: docs } = await window.supabaseClient.from('user_documents').select('*').eq('user_id', userId);
+            const docList = document.getElementById('d-docs-list');
+            docList.innerHTML = '';
+            if (docs && docs.length > 0) {
+                docs.forEach(d => {
+                    const item = document.createElement('div');
+                    item.className = "flex justify-between items-center bg-slate-800 p-3 rounded-lg border border-slate-700";
+                    item.innerHTML = `
+                        <span class="text-xs text-slate-300 font-bold">${d.doc_type}</span>
+                        <button onclick="viewDocument('${d.file_url}')" class="text-[10px] text-indigo-400 font-bold hover:underline">View PDF</button>
+                    `;
+                    docList.appendChild(item);
+                });
+            } else {
+                docList.innerHTML = '<p class="text-xs text-slate-500 italic">No documents uploaded.</p>';
+            }
+
+            // Show Drawer
+            document.getElementById('drawerOverlay').classList.remove('hidden');
+            document.getElementById('memberDrawer').classList.remove('drawer-closed');
+            document.getElementById('memberDrawer').classList.add('drawer-open');
+        }
+
+        function closeDrawer() {
+            document.getElementById('memberDrawer').classList.add('drawer-closed');
+            document.getElementById('memberDrawer').classList.remove('drawer-open');
+            setTimeout(() => {
+                document.getElementById('drawerOverlay').classList.add('hidden');
+            }, 300);
+        }
+
+        async function viewDocument(path) {
+            const { data } = await window.supabaseClient.storage.from('documents').createSignedUrl(path, 60);
+            if (data) window.open(data.signedUrl, '_blank');
+        }
+
+        // --- ADMIN ACTIONS ---
+        async function sendPasswordReset() {
+            const member = allMembers.find(m => m.id === currentMemberId);
+            if (!member || !member.email) return alert('No email found for this member.');
+            const { data, error } = await window.supabaseClient.auth.admin.resetPasswordForEmail(member.email);
+            if (error) alert('Failed to send reset: ' + error.message);
+            else alert('Password reset email sent!');
+        }
+
+        function sendWhatsAppMessage() {
+            const member = allMembers.find(m => m.id === currentMemberId);
+            if (!member || !member.phone_number) return alert('No phone number found.');
+            const phone = member.phone_number.replace(/^0/, '254');
+            const url = `https://wa.me/${phone}`;
+            window.open(url, '_blank');
+        }
+
+        function sendInAppMessage() {
+            const member = allMembers.find(m => m.id === currentMemberId);
+            if (!member) return alert('No member found.');
+            const msg = prompt('Enter message to send to this member:');
+            if (!msg) return;
+            // Save to a messages table (pseudo-code, implement as needed)
+            window.supabaseClient.from('admin_messages').insert({ user_id: member.id, message: msg }).then(({ error }) => {
+                if (error) alert('Failed to send message: ' + error.message);
+                else alert('Message sent!');
+            });
+        }
+
+        async function toggleBan() {
+            const member = allMembers.find(m => m.id === currentMemberId);
+            const newStatus = member.membership_status === 'banned' ? 'active' : 'banned';
+            const action = newStatus === 'banned' ? 'BAN' : 'UNBAN';
+
+            if (!confirm(`Are you sure you want to ${action} this member?`)) return;
+
+            const { error } = await window.supabaseClient.from('profiles').update({ membership_status: newStatus }).eq('id', currentMemberId);
+
+            if (error) alert("Error: " + error.message);
+            else {
+                alert(`Member ${action}NED successfully.`);
+                closeDrawer();
+                fetchMembers(); // Refresh List
             }
         }
 
-        function closeDossier() { document.getElementById('dossierModal').classList.add('hidden'); }
-        async function handleLogout() { await window.supabaseClient.auth.signOut(); window.location.href = "login.html"; }
+        async function handleLogout() {
+            await window.supabaseClient.auth.signOut();
+            window.location.href = "login.html";
+        }
 
-        loadMembers();
+        init();
     </script>
 </body>
 </html>

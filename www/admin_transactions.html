@@ -3,171 +3,219 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JuvinalPay HQ | Universal Ledger</title>
+    <title>JuvinalPay HQ | Transactions</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: #f1f5f9; margin: 0; display: flex; min-height: 100vh; }
-        
-        /* LOCKED SIDEBAR */
-        aside.master-sidebar { width: 18rem !important; height: 100vh; position: fixed; left: 0; top: 0; background-color: #020617; border-right: 1px solid #1e293b; display: flex; flex-direction: column; padding: 1.5rem; z-index: 50; }
-        .nav-item { display: flex; align-items: center; gap: 1rem; padding: 0.875rem 1.25rem; font-size: 0.875rem; font-weight: 700; color: #94a3b8; border-radius: 1rem; transition: all 0.2s; text-decoration: none; margin-bottom: 0.25rem; white-space: nowrap; }
-        .nav-item.active { background: #4f46e5; color: #ffffff; box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4); }
-        
-        main.dashboard-container { flex: 1; margin-left: 18rem; padding: 2.5rem; display: flex; flex-direction: column; height: 100vh; }
-        .ledger-scroll { overflow-y: auto; flex: 1; border-radius: 2rem; border: 1px solid #1e293b; background: rgba(15, 23, 42, 0.5); }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .nav-item { transition: all 0.2s ease-in-out; }
+        .nav-item:hover { background-color: rgba(30, 41, 59, 0.5); transform: translateX(4px); color: white; }
+        .nav-item.active { background-color: #4f46e5; color: white; box-shadow: 0 4px 20px rgba(79, 70, 229, 0.3); }
     </style>
 </head>
-<body>
+<body class="flex h-screen overflow-hidden text-slate-100">
 
-    <aside class="master-sidebar">
-        <div class="mb-10 px-2"><h1 class="text-2xl font-extrabold italic">JuvinalPay<span class="text-indigo-500">.</span></h1></div>
-        <nav class="flex-1">
-            <a href="admin_finance.html" class="nav-item">📊 Financial Command</a>
-            <a href="admin_members.html" class="nav-item">👥 Member Capital</a>
-            <a href="admin_loans.html" class="nav-item">💰 Credit Portfolio</a>
-            <a href="admin_debt_collector.html" class="nav-item">🚨 Collections HQ</a>
-            <a href="admin_transactions.html" class="nav-item active">📜 Universal Ledger</a>
-            <a href="admin_settings.html" class="nav-item">⚙️ Global Rules</a>
+    <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col z-20 shrink-0">
+        <div class="p-8 pb-4">
+            <h1 class="text-2xl font-extrabold tracking-tight text-white italic flex items-center gap-2">
+                JuvinalPay<span class="text-indigo-500">.</span>
+            </h1>
+            <p class="text-xs text-slate-500 font-bold mt-1 tracking-widest uppercase">Admin Workspace</p>
+        </div>
+        <nav class="flex-1 px-4 space-y-1 overflow-y-auto no-scrollbar">
+            <a href="admin_dashboard.html" class="nav-item flex items-center gap-3 px-4 py-3.5 text-xs font-bold text-slate-400 rounded-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm4 0h2v-6H7v6zm4 0h2v-10h-2v10zm4 0h2v-4h-2v4zm4 0h2v-8h-2v8z"/></svg> Dashboard</a>
+            <a href="admin_finance.html" class="nav-item flex items-center gap-3 px-4 py-3.5 text-xs font-bold text-slate-400 rounded-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/></svg> Financial HQ</a>
+            <a href="admin_members.html" class="nav-item flex items-center gap-3 px-4 py-3.5 text-xs font-bold text-slate-400 rounded-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87M16 3.13a4 4 0 010 7.75M8 3.13a4 4 0 000 7.75"/></svg> Member Capital</a>
+            <a href="admin_loans.html" class="nav-item flex items-center gap-3 px-4 py-3.5 text-xs font-bold text-slate-400 rounded-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 10c-4.41 0-8-1.79-8-4V6c0-2.21 3.59-4 8-4s8 1.79 8 4v8c0 2.21-3.59 4-8 4z"/></svg> Credit Portfolio</a>
+            <a href="admin_debt_collector.html" class="nav-item flex items-center gap-3 px-4 py-3.5 text-xs font-bold text-slate-400 rounded-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18.364 5.636l-1.414 1.414A9 9 0 105.636 18.364l1.414-1.414A7 7 0 1118.364 5.636z"/></svg> Collections HQ</a>
+            <a href="admin_transactions.html" class="nav-item active flex items-center gap-3 px-4 py-3.5 text-xs font-bold rounded-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg> Universal Ledger</a>
+            <a href="admin_settings.html" class="nav-item flex items-center gap-3 px-4 py-3.5 text-xs font-bold text-slate-400 rounded-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 20c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg> Global Rules</a>
         </nav>
-        <button onclick="handleLogout()" class="nav-item text-rose-500 mt-auto border border-rose-500/20">🚪 Logout Session</button>
+        <div class="p-4 border-t border-slate-800">
+            <button onclick="handleLogout()" class="w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all"><span class="text-lg">🚪</span> Logout Session</button>
+        </div>
     </aside>
 
-    <main class="dashboard-container">
-        <header class="flex justify-between items-center mb-10">
+    <main class="flex-1 flex flex-col relative overflow-hidden bg-slate-900">
+        
+        <header class="h-20 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 flex justify-between items-center px-8 sticky top-0 z-10">
             <div>
-                <h2 class="text-3xl font-extrabold tracking-tight">Audit Surveillance</h2>
-                <p class="text-slate-400 text-sm mt-1">Live feed of all institutional financial movements.</p>
+                <h2 class="text-xl font-bold text-white">Universal Ledger</h2>
+                <p class="text-xs text-slate-400">Complete Audit Trail of All Funds</p>
             </div>
-            <button onclick="downloadAuditPDF()" class="bg-white text-slate-900 text-[10px] font-bold px-6 py-3 rounded-xl shadow-lg hover:bg-slate-200 transition-all">EXPORT STATEMENT</button>
+            
+            <div class="relative w-96 group">
+                <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Search Receipt (e.g. QKH...) or User..." 
+                    class="w-full bg-slate-800 border border-slate-700 text-xs font-bold text-white px-4 py-3 pl-10 rounded-xl outline-none focus:border-indigo-500 focus:bg-slate-800 transition-all placeholder:text-slate-500">
+                <span class="absolute left-3 top-3 text-slate-500 group-focus-within:text-indigo-500 transition-colors">🔍</span>
+            </div>
         </header>
 
-        <div class="flex gap-4 mb-6 bg-slate-900/50 p-4 rounded-[24px] border border-slate-800">
-            <input type="text" id="auditSearch" onkeyup="applyFilters()" placeholder="Search Name or Ref Code..." 
-                class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-5 py-3 text-sm focus:ring-2 focus:ring-indigo-500 outline-none text-white font-bold">
-            <select id="typeFilter" onchange="applyFilters()" class="bg-slate-950 border border-slate-800 rounded-xl px-5 py-3 text-sm text-slate-400 font-bold outline-none">
-                <option value="all">ALL TYPES</option>
-                <option value="membership_fee">REGISTRATION</option>
-                <option value="deposit">SAVINGS</option>
-                <option value="loan_disbursement">LOAN PAYOUTS</option>
-            </select>
+        <div class="px-8 pt-8 pb-4">
+            <div class="flex gap-1 p-1 bg-slate-800 rounded-xl w-fit border border-slate-700/50">
+                <button onclick="switchTab('all')" class="tab-btn active px-5 py-2 rounded-lg text-[10px] uppercase font-bold tracking-wider transition-all bg-indigo-600 text-white shadow-lg" data-tab="all">All Records</button>
+                <button onclick="switchTab('in')" class="tab-btn px-5 py-2 rounded-lg text-[10px] uppercase font-bold tracking-wider text-slate-400 hover:text-white transition-all" data-tab="in">🟢 Money In</button>
+                <button onclick="switchTab('out')" class="tab-btn px-5 py-2 rounded-lg text-[10px] uppercase font-bold tracking-wider text-slate-400 hover:text-white transition-all" data-tab="out">🔴 Money Out</button>
+            </div>
         </div>
 
-        <div class="ledger-scroll">
-            <table class="w-full text-left border-collapse">
-                <thead class="sticky top-0 bg-slate-900/95 backdrop-blur-xl border-b border-slate-800 z-10">
-                    <tr>
-                        <th class="p-6 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Timestamp</th>
-                        <th class="p-6 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Entity / Ref</th>
-                        <th class="p-6 text-[10px] font-bold text-slate-500 uppercase tracking-widest">Amount</th>
-                        <th class="p-6 text-[10px] font-bold text-slate-500 uppercase tracking-widest text-right">Memo</th>
-                    </tr>
-                </thead>
-                <tbody id="ledgerContent">
-                    </tbody>
-            </table>
+        <div class="flex-1 overflow-y-auto px-8 pb-10 scrollbar-hide">
+            <div class="border border-slate-700 rounded-2xl overflow-hidden bg-slate-800/20 backdrop-blur-sm">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-800/80 text-slate-400 text-[10px] uppercase font-bold tracking-widest sticky top-0 z-10 backdrop-blur-md">
+                        <tr>
+                            <th class="p-5 border-b border-slate-700">Time</th>
+                            <th class="p-5 border-b border-slate-700">M-Pesa Ref</th>
+                            <th class="p-5 border-b border-slate-700">Member</th>
+                            <th class="p-5 border-b border-slate-700">Description</th>
+                            <th class="p-5 border-b border-slate-700 text-right">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody id="txTableBody" class="text-sm font-medium text-slate-300 divide-y divide-slate-700/50">
+                        </tbody>
+                </table>
+                
+                <div id="emptyState" class="hidden flex flex-col items-center justify-center py-20 opacity-50">
+                    <div class="text-5xl mb-4">📜</div>
+                    <p class="text-slate-400 font-bold">No records found.</p>
+                </div>
+            </div>
         </div>
+
     </main>
 
     <script>
-        let auditData = [];
+        let allTx = []; 
+        let currentFilter = 'all';
 
-        async function initAudit() {
-            // Fetch transactions AND the member name (joined query)
+        async function init() {
+            if (!window.supabaseClient) return;
+            await fetchTransactions();
+            // Real-time listener for 'transactions' table
+            window.txSubscription = window.supabaseClient
+                .channel('admin-tx-channel')
+                .on(
+                    'postgres_changes',
+                    { event: '*', schema: 'public', table: 'transactions' },
+                    (payload) => {
+                        console.log('Change received!', payload);
+                        fetchTransactions();
+                    }
+                )
+                .subscribe();
+        }
+
+        async function fetchTransactions() {
+            const tbody = document.getElementById('txTableBody');
+            tbody.innerHTML = '<tr><td colspan="5" class="p-12 text-center text-slate-500 animate-pulse font-mono text-xs">RETRIEVING LEDGER...</td></tr>';
+
+            // Fetch with Profile Data
             const { data, error } = await window.supabaseClient
                 .from('transactions')
-                .select('*, profiles(full_name)')
-                .order('created_at', { ascending: false });
+                .select('*, profiles(full_name, phone_number)')
+                .order('created_at', { ascending: false })
+                .limit(500); // Limit to last 500 for performance
 
             if (error) {
-                console.error("Ledger Error:", error.message);
-                return;
+                console.error(error);
+                return alert("Error loading ledger");
             }
 
-            auditData = data; 
-            renderLedger(data); 
+            allTx = data;
+            renderTable();
         }
 
-        function renderLedger(data) {
-            const body = document.getElementById('ledgerContent');
-            if (data.length === 0) {
-                body.innerHTML = '<tr><td colspan="4" class="p-20 text-center text-slate-500 font-bold uppercase tracking-widest">No Transactions Found</td></tr>';
+        function renderTable() {
+            const tbody = document.getElementById('txTableBody');
+            const emptyState = document.getElementById('emptyState');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+
+            const filtered = allTx.filter(tx => {
+                // Tab Filter
+                let matchesTab = true;
+                if (currentFilter === 'in') matchesTab = tx.amount > 0;
+                if (currentFilter === 'out') matchesTab = tx.amount < 0;
+
+                // Search Filter
+                const matchesSearch = 
+                    (tx.profiles?.full_name || '').toLowerCase().includes(search) ||
+                    (tx.mpesa_reference || '').toLowerCase().includes(search) ||
+                    (tx.description || '').toLowerCase().includes(search);
+                
+                return matchesTab && matchesSearch;
+            });
+
+            tbody.innerHTML = '';
+
+            if (filtered.length === 0) {
+                emptyState.classList.remove('hidden');
                 return;
             }
+            emptyState.classList.add('hidden');
 
-            body.innerHTML = data.map(t => {
-                const isPositive = ['deposit', 'membership_fee', 'loan_repayment'].includes(t.transaction_type);
-                const date = new Date(t.created_at).toLocaleString();
+            filtered.forEach(tx => {
+                const row = document.createElement('tr');
+                row.className = "hover:bg-slate-700/30 transition-colors";
                 
-                return `
-                <tr class="border-b border-slate-900 hover:bg-white/5 transition-all">
-                    <td class="p-6">
-                        <p class="text-[11px] font-bold text-slate-400">${date}</p>
+                const isPositive = tx.amount > 0;
+                const amountClass = isPositive ? "text-emerald-400" : "text-rose-400";
+                const sign = isPositive ? "+" : "";
+
+                // Format Type
+                let typeBadge = '';
+                if(tx.transaction_type.includes('loan')) typeBadge = '🔹';
+                else if(tx.transaction_type.includes('fee')) typeBadge = '🔸';
+                else typeBadge = '�';
+
+                row.innerHTML = `
+                    <td class="p-5 text-xs text-slate-500 font-mono">
+                        ${new Date(tx.created_at).toLocaleString()}
                     </td>
-                    <td class="p-6">
-                        <p class="text-sm font-bold text-slate-100">${t.profiles?.full_name || 'System'}</p>
-                        <p class="text-[9px] font-mono text-indigo-500 uppercase">${t.mpesa_reference || 'INTERNAL'}</p>
-                    </td>
-                    <td class="p-6">
-                        <span class="text-sm font-extrabold ${isPositive ? 'text-emerald-400' : 'text-rose-400'}">
-                            ${isPositive ? '+' : '-'} KES ${t.amount.toLocaleString()}
+                    <td class="p-5">
+                        <span class="bg-slate-800 text-slate-300 px-2 py-1 rounded text-[10px] font-mono border border-slate-700">
+                            ${tx.mpesa_reference || 'SYS-REF'}
                         </span>
                     </td>
-                    <td class="p-6 text-right text-[10px] text-slate-500 font-bold uppercase tracking-widest">
-                        ${t.transaction_type.replace('_', ' ')}
+                    <td class="p-5">
+                        <div class="font-bold text-white text-sm">${tx.profiles?.full_name || 'System'}</div>
+                        <div class="text-[10px] text-slate-500">${tx.profiles?.phone_number || '-'}</div>
                     </td>
-                </tr>`;
-            }).join('');
-        }
-
-        function applyFilters() {
-            const term = document.getElementById('auditSearch').value.toLowerCase();
-            const type = document.getElementById('typeFilter').value;
-
-            const filtered = auditData.filter(t => {
-                const matchesText = (t.profiles?.full_name?.toLowerCase().includes(term)) || 
-                                    (t.mpesa_reference?.toLowerCase().includes(term));
-                const matchesType = type === 'all' || t.transaction_type === type;
-                return matchesText && matchesType;
+                    <td class="p-5 text-slate-300">
+                        ${typeBadge} <span class="capitalize">${tx.description}</span>
+                    </td>
+                    <td class="p-5 text-right font-black ${amountClass}">
+                        ${sign}KES ${Math.abs(tx.amount).toLocaleString()}
+                    </td>
+                `;
+                tbody.appendChild(row);
             });
-
-            renderLedger(filtered);
         }
 
-        async function downloadAuditPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            doc.text("JuvinalPay Institutional Audit", 14, 20);
-            
-            const rows = auditData.map(t => [
-                new Date(t.created_at).toLocaleDateString(),
-                t.profiles?.full_name || 'System',
-                t.mpesa_reference || '---',
-                `KES ${t.amount}`,
-                t.transaction_type
-            ]);
-
-            doc.autoTable({
-                head: [['Date', 'Entity', 'Reference', 'Amount', 'Type']],
-                body: rows,
-                startY: 30,
-                theme: 'grid',
-                styles: { fontSize: 8 }
+        function switchTab(tab) {
+            currentFilter = tab;
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                if (btn.dataset.tab === tab) {
+                    btn.classList.add('bg-indigo-600', 'text-white', 'shadow-lg');
+                    btn.classList.remove('text-slate-400');
+                } else {
+                    btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-lg');
+                    btn.classList.add('text-slate-400');
+                }
             });
-
-            doc.save('JuvinalPay_Audit_Report.pdf');
+            renderTable();
         }
+
+        function filterTable() { renderTable(); }
 
         async function handleLogout() {
             await window.supabaseClient.auth.signOut();
             window.location.href = "login.html";
         }
 
-        initAudit();
+        init();
     </script>
 </body>
 </html>

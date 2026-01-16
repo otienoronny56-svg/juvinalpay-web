@@ -1,27 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+        <!-- Font Awesome for modern icons -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JuvinalPay | Secure Pay</title>
+    <title>JuvinalPay | Secure Payment</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <style>body { font-family: 'Plus Jakarta Sans', sans-serif; }</style>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F8FAFC; }
+        .option-radio:checked + div { border-color: #4F46E5; background-color: #EEF2FF; color: #4338ca; }
+        /* Smooth entry animation */
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+        .animate-slide-up { animation: slideUp 0.3s ease-out; }
+    </style>
 </head>
 <body class="bg-slate-900 h-screen flex flex-col justify-end">
 
-    <div class="bg-white rounded-t-[32px] p-8 h-[85vh] flex flex-col relative overflow-hidden">
+    <div class="bg-white rounded-t-[32px] p-8 h-[92vh] flex flex-col relative animate-slide-up">
         
-        <div class="w-12 h-1 bg-slate-200 rounded-full mx-auto mb-8"></div>
+        <div class="w-12 h-1 bg-slate-200 rounded-full mx-auto mb-6"></div>
 
-        <div class="text-center mb-8">
-            <div class="h-16 w-16 bg-indigo-50 text-indigo-600 rounded-2xl mx-auto flex items-center justify-center text-2xl mb-4 border border-indigo-100">
-                💸
-            </div>
-            <h1 class="text-2xl font-extrabold text-slate-900">M-Pesa Express</h1>
-            <p class="text-xs text-slate-400 mt-2 font-medium">Enter amount to deposit/repay.</p>
+        <header class="text-center mb-6">
+            <h1 id="pageTitle" class="text-2xl font-extrabold text-slate-900">Make a Deposit</h1>
+            <p id="pageSub" class="text-xs text-slate-400 mt-1 font-medium">Select where to allocate funds.</p>
+        </header>
+
+        <div id="optionsContainer" class="space-y-3 mb-8">
+            <label class="cursor-pointer">
+                <input type="radio" name="depType" value="savings_deposit" class="option-radio hidden" checked>
+                <div class="border border-slate-200 rounded-2xl p-4 flex items-center gap-4 transition-all">
+                    <div class="h-10 w-10 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center text-lg">💰</div>
+                    <div>
+                        <p class="text-sm font-bold">Savings Account</p>
+                        <p class="text-[10px] text-slate-400">Withdraw anytime</p>
+                    </div>
+                </div>
+            </label>
+
+            <label class="cursor-pointer">
+                <input type="radio" name="depType" value="share_capital" class="option-radio hidden">
+                <div class="border border-slate-200 rounded-2xl p-4 flex items-center gap-4 transition-all">
+                    <div class="h-10 w-10 bg-purple-100 text-purple-600 rounded-full flex items-center justify-center text-lg">📈</div>
+                    <div>
+                        <p class="text-sm font-bold">Share Capital</p>
+                        <p class="text-[10px] text-slate-400">Buy ownership (Non-withdrawable)</p>
+                    </div>
+                </div>
+            </label>
         </div>
 
         <div class="bg-slate-50 p-6 rounded-3xl border border-slate-100 mb-6">
@@ -29,45 +58,119 @@
             <input type="number" id="payAmount" class="w-full bg-transparent text-4xl font-extrabold text-slate-900 outline-none placeholder:text-slate-200" placeholder="0">
         </div>
 
-        <button onclick="triggerSTK()" class="w-full bg-emerald-500 text-white font-bold py-5 rounded-2xl shadow-xl shadow-emerald-200 active:scale-95 transition-all mt-auto mb-8 text-lg">
-            Pay Now
+            <button onclick="triggerSTK()" id="payBtn" class="w-full bg-slate-900 text-white font-bold py-5 rounded-2xl shadow-xl shadow-slate-200 active:scale-95 transition-all mt-auto mb-4 text-lg">
+                <i class="fa-solid fa-paper-plane mr-2"></i> <span>Initialize Payment</span>
         </button>
-
-        <button onclick="window.history.back()" class="text-xs font-bold text-slate-400 text-center pb-4">Cancel Transaction</button>
+        
+        <button onclick="window.history.back()" id="cancelBtn" class="text-xs font-bold text-slate-400 text-center pb-4 hover:text-slate-600">Cancel</button>
     </div>
 
     <script>
+        // 1. Initialize Page Logic (Check if New or Existing Member)
+        async function initPage() {
+            if (!window.supabaseClient) return;
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const isBoarding = urlParams.get('mode') === 'onboarding';
+
+            // If user is here for the Mandatory Fee
+            if (isBoarding) {
+                // Fetch the EXACT fee from Admin Settings
+                const { data: config } = await window.supabaseClient.from('sacco_configs').select('membership_fee').single();
+                const fee = config ? config.membership_fee : 100; // Fallback
+
+                // Lock the UI
+                document.getElementById('pageTitle').innerText = "Activate Membership";
+                document.getElementById('pageSub').innerText = "Complete this step to access your dashboard.";
+                
+                const amtInput = document.getElementById('payAmount');
+                amtInput.value = fee;
+                amtInput.disabled = true; // User cannot change this
+                amtInput.classList.add('opacity-50');
+
+                document.getElementById('cancelBtn').style.display = 'none'; // Cannot cancel
+
+                // Replace options with a single Locked Option
+                const container = document.getElementById('optionsContainer');
+                container.innerHTML = `
+                    <label class="cursor-pointer">
+                        <input type="radio" name="depType" value="membership_fee" class="option-radio hidden" checked>
+                        <div class="border border-indigo-500 bg-indigo-50 rounded-2xl p-4 flex items-center gap-4">
+                            <div class="h-10 w-10 bg-indigo-600 text-white rounded-full flex items-center justify-center text-lg">🔒</div>
+                            <div>
+                                <p class="text-sm font-bold text-indigo-900">Registration Fee</p>
+                                <p class="text-[10px] text-indigo-500 font-bold">Mandatory One-Time Payment</p>
+                            </div>
+                        </div>
+                    </label>
+                `;
+            }
+        }
+
+        // 2. The Smart Payment Trigger
         async function triggerSTK() {
             const amount = document.getElementById('payAmount').value;
-            if(!amount || amount < 1) return alert("Enter valid amount");
+            const type = document.querySelector('input[name="depType"]:checked').value;
 
-            const btn = document.querySelector('button');
+            if(!amount || amount < 1) return alert("Please enter a valid amount.");
+
+            const btn = document.getElementById('payBtn');
+            const originalText = btn.innerText;
             btn.innerText = "Connecting to Safaricom...";
             btn.disabled = true;
 
-            const { data: { user } } = await window.supabaseClient.auth.getUser();
-            const { data: profile } = await window.supabaseClient.from('profiles').select('phone_number').eq('id', user.id).single();
+            try {
+                // Get User Info
+                const { data: { user } } = await window.supabaseClient.auth.getUser();
+                if(!user) throw new Error("User not found");
 
-            let phone = profile.phone_number.replace(/^0/, '254'); // Convert 07... to 2547...
+                const { data: profile } = await window.supabaseClient.from('profiles').select('phone_number').eq('id', user.id).single();
+                let phone = profile.phone_number.replace(/^0/, '254'); // Ensure format 254...
 
-            // Call the Edge Function
-            const { data, error } = await window.supabaseClient.functions.invoke('stk-push', {
-                body: { 
-                    phone: phone, 
-                    amount: parseInt(amount), 
-                    depositType: 'Savings' // or 'LoanRepayment' logic 
+                // A. Send the STK Push
+                const { data, error } = await window.supabaseClient.functions.invoke('stk-push', {
+                    body: { 
+                        phone: phone, 
+                        amount: parseInt(amount), 
+                        depositType: type // We send the type, but we also save it locally below
+                    }
+                });
+
+                if(error || (data && data.ResponseCode !== "0")) {
+                    throw new Error(data?.CustomerMessage || "Connection failed.");
                 }
-            });
 
-            if(error || (data && data.ResponseCode !== "0")) {
-                alert("Transaction Failed. Check phone number.");
+                // B. SAVE THE INTENT (The Fix)
+                // We record that "CheckoutRequestID XYZ" = "Savings"
+                // The callback will read this later to know where to put the money.
+                const { error: memoryError } = await window.supabaseClient
+                    .from('payment_requests')
+                    .insert({
+                        checkout_request_id: data.CheckoutRequestID,
+                        user_id: user.id,
+                        amount: parseInt(amount),
+                        intent: type
+                    });
+
+                if (memoryError) console.error("Memory Save Failed:", memoryError);
+
+                // C. Handle UI Success
+                if (type === 'membership_fee') {
+                    window.location.href = "success.html"; // Send to waiting room
+                } else {
+                    alert(`✓ STK Push Sent!\n\nCheck your phone to authorize the ${type.replace('_', ' ')}.`);
+                    window.location.href = "dashboard.html";
+                }
+
+            } catch (err) {
+                alert("Transaction Failed: " + err.message);
                 btn.innerText = "Try Again";
                 btn.disabled = false;
-            } else {
-                alert("✓ STK Push Sent! Check your phone.");
-                window.location.href = "dashboard.html";
             }
         }
+
+        // Initialize immediately
+        initPage();
     </script>
 </body>
 </html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+            <!-- Font Awesome for modern icons -->
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <style>
+            body.dark { background-color: #0f172a; color: #f8fafc; }
+            body.dark .bg-white { background-color: #1e293b; border-color: #334155; color: white; }
+            body.dark .text-slate-900 { color: white; }
+            body.dark .text-slate-800 { color: #cbd5e1; }
+        </style>
+        <!-- Theme script moved below -->
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>JuvinalPay | Withdraw</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; }</style>
+</head>
+<body class="h-screen flex flex-col justify-end">
+
+    <script>
+        // Global Theme Logic
+        function applyTheme() {
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark');
+            } else {
+                document.body.classList.remove('dark');
+            }
+        }
+        applyTheme();
+        window.addEventListener('storage', applyTheme);
+    </script>
+
+    <div class="bg-white rounded-t-[32px] h-[92vh] w-full flex flex-col relative animate-slide-up">
+        
+        <div class="w-12 h-1 bg-slate-200 rounded-full mx-auto mb-6 mt-6"></div>
+
+        <div class="px-8 pb-10 flex-1 flex flex-col">
+            <header class="text-center mb-8">
+                <h1 class="text-2xl font-extrabold text-slate-900">Withdraw Savings</h1>
+                <p class="text-xs text-slate-400 mt-1 font-medium">Transfer funds to your M-Pesa.</p>
+            </header>
+
+            <div class="bg-slate-50 border border-slate-100 p-6 rounded-3xl mb-8 flex justify-between items-center">
+                <div>
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Available</p>
+                    <h3 id="availBal" class="text-xl font-black text-slate-900">...</h3>
+                </div>
+                <div class="text-right">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Fee</p>
+                    <h3 id="feeDisplay" class="text-xl font-black text-rose-500">...</h3>
+                </div>
+            </div>
+
+            <div class="space-y-6 mb-auto">
+                <div>
+                    <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest ml-2 mb-2 block">Amount to Withdraw</label>
+                    <input type="number" id="amount" class="w-full p-5 bg-white border-2 border-slate-100 rounded-2xl font-bold text-slate-900 text-3xl outline-none focus:border-indigo-500 transition-all placeholder:text-slate-200" placeholder="0">
+                </div>
+                
+                <div class="flex justify-between px-2">
+                     <p class="text-xs font-bold text-slate-400">Total Deducted</p>
+                     <p id="totalDed" class="font-bold text-slate-900">KES 0</p>
+                </div>
+            </div>
+
+            <button onclick="processWithdraw()" id="wBtn" class="w-full bg-slate-900 text-white font-bold py-5 rounded-2xl shadow-xl active:scale-95 transition-all mb-4">
+                <i class="fa-solid fa-money-bill-wave mr-2"></i> <span>Confirm Withdraw</span>
+            </button>
+            
+            <button onclick="window.location.href='dashboard.html'" class="text-xs font-bold text-slate-400 text-center pb-8">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        let balance = 0;
+        let fee = 0;
+
+        async function init() {
+            if (!window.supabaseClient) return;
+            const { data: { user } } = await window.supabaseClient.auth.getUser();
+            if (!user) return window.location.href = "login.html";
+
+            // 1. Get Fee
+            const { data: config } = await window.supabaseClient.from('sacco_configs').select('transaction_fee').single();
+            fee = config?.transaction_fee || 10;
+            document.getElementById('feeDisplay').innerText = `KES ${fee}`;
+
+            // 2. Get Balance
+            const { data: profile } = await window.supabaseClient.from('profiles').select('savings_balance').eq('id', user.id).single();
+            balance = profile?.savings_balance || 0;
+            document.getElementById('availBal').innerText = `KES ${balance.toLocaleString()}`;
+
+            // 3. Calc Logic
+            document.getElementById('amount').addEventListener('input', (e) => {
+                const val = parseFloat(e.target.value) || 0;
+                const total = val + fee;
+                const el = document.getElementById('totalDed');
+                el.innerText = `KES ${total.toLocaleString()}`;
+                
+                if(total > balance) el.classList.add('text-rose-500');
+                else el.classList.remove('text-rose-500');
+            });
+        }
+
+        async function processWithdraw() {
+            const amount = parseFloat(document.getElementById('amount').value);
+            if(!amount || amount <= 0) return alert("Enter valid amount");
+            if(amount + fee > balance) return alert("Insufficient funds for withdrawal + fee.");
+
+            const btn = document.getElementById('wBtn');
+            btn.innerText = "Processing..."; btn.disabled = true;
+
+            try {
+                const { data: { user } } = await window.supabaseClient.auth.getUser();
+                const { data: profile } = await window.supabaseClient.from('profiles').select('phone_number').eq('id', user.id).single();
+
+                // Call Backend
+                const { data, error } = await window.supabaseClient.functions.invoke('withdraw-funds', {
+                    body: { 
+                        userId: user.id, 
+                        amount: amount, 
+                        phone: profile.phone_number 
+                    }
+                });
+
+                if(error || data.error) throw new Error(data?.error || error?.message);
+
+                alert("✓ Success! Funds sent to M-Pesa.");
+                window.location.href = "dashboard.html";
+
+            } catch (err) {
+                alert("Error: " + err.message);
+                btn.innerText = "Confirm Withdraw"; btn.disabled = false;
+            }
+        }
+
+        init();
+    </script>
+</body>
+</html>

@@ -7,145 +7,321 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="supabase-config.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap');
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; color: #f8fafc; margin: 0; display: flex; min-height: 100vh; overflow-x: hidden; }
-        aside.master-sidebar { width: 18rem !important; height: 100vh; position: fixed; left: 0; top: 0; background-color: #020617; border-right: 1px solid #1e293b; display: flex; flex-direction: column; padding: 1.5rem; z-index: 50; }
-        .nav-item { display: flex; align-items: center; gap: 1rem; padding: 0.875rem 1.25rem; font-size: 0.875rem; font-weight: 700; color: #94a3b8; border-radius: 1rem; transition: all 0.2s; text-decoration: none; margin-bottom: 0.25rem; white-space: nowrap; }
-        .nav-item:hover { background: rgba(255, 255, 255, 0.05); color: #ffffff; }
-        .nav-item.active { background: #4f46e5; color: #ffffff; box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4); }
-        main.dashboard-container { flex: 1; margin-left: 18rem; padding: 2.5rem; }
+        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #0f172a; }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        /* Premium Hover Effect for Sidebar */
+        .nav-item { transition: all 0.2s ease-in-out; }
+        .nav-item:hover { background-color: rgba(30, 41, 59, 0.5); transform: translateX(4px); color: white; }
+        .nav-item.active { background-color: #4f46e5; color: white; box-shadow: 0 4px 20px rgba(79, 70, 229, 0.3); }
     </style>
 </head>
-<body>
+<body class="flex h-screen overflow-hidden text-slate-100">
 
-    <aside class="master-sidebar">
-        <div class="mb-10 px-2"><h1 class="text-2xl font-extrabold italic">JuvinalPay<span class="text-indigo-500">.</span></h1></div>
-        <nav class="flex-1">
-            <a href="admin_finance.html" class="nav-item">📊 Financial Command</a>
-            <a href="admin_members.html" class="nav-item">👥 Member Capital</a>
-            <a href="admin_loans.html" class="nav-item active">💰 Credit Portfolio</a>
-            <a href="admin_debt_collector.html" class="nav-item">🚨 Collections HQ</a>
-            <a href="admin_transactions.html" class="nav-item">📜 Universal Ledger</a>
-            <a href="admin_settings.html" class="nav-item">⚙️ Global Rules</a>
+    <aside class="w-64 bg-slate-900 border-r border-slate-800 flex flex-col z-20 shrink-0">
+        <div class="p-8 pb-4">
+            <h1 class="text-2xl font-extrabold tracking-tight text-white italic flex items-center gap-2">
+                JuvinalPay<span class="text-indigo-500">.</span>
+            </h1>
+            <p class="text-xs text-slate-500 font-bold mt-1 tracking-widest uppercase">Admin Workspace</p>
+        </div>
+
+        <nav class="flex-1 px-4 space-y-1 overflow-y-auto no-scrollbar">
+            <a href="admin_dashboard.html" class="nav-item flex items-center gap-3 px-4 py-3.5 text-xs font-bold text-slate-400 rounded-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm4 0h2v-6H7v6zm4 0h2v-10h-2v10zm4 0h2v-4h-2v4zm4 0h2v-8h-2v8z"/></svg> Dashboard</a>
+            <a href="admin_finance.html" class="nav-item flex items-center gap-3 px-4 py-3.5 text-xs font-bold text-slate-400 rounded-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/></svg> Financial HQ</a>
+            <a href="admin_members.html" class="nav-item flex items-center gap-3 px-4 py-3.5 text-xs font-bold text-slate-400 rounded-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87M16 3.13a4 4 0 010 7.75M8 3.13a4 4 0 000 7.75"/></svg> Member Capital</a>
+            <a href="admin_loans.html" class="nav-item active flex items-center gap-3 px-4 py-3.5 text-xs font-bold rounded-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 10c-4.41 0-8-1.79-8-4V6c0-2.21 3.59-4 8-4s8 1.79 8 4v8c0 2.21-3.59 4-8 4z"/></svg> Credit Portfolio</a>
+            <a href="admin_debt_collector.html" class="nav-item flex items-center gap-3 px-4 py-3.5 text-xs font-bold text-slate-400 rounded-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18.364 5.636l-1.414 1.414A9 9 0 105.636 18.364l1.414-1.414A7 7 0 1118.364 5.636z"/></svg> Collections HQ</a>
+            <a href="admin_transactions.html" class="nav-item flex items-center gap-3 px-4 py-3.5 text-xs font-bold text-slate-400 rounded-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg> Universal Ledger</a>
+            <a href="admin_settings.html" class="nav-item flex items-center gap-3 px-4 py-3.5 text-xs font-bold text-slate-400 rounded-xl"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0-6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 20c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg> Global Rules</a>
         </nav>
-        <button onclick="handleLogout()" class="nav-item text-rose-500 mt-auto border border-rose-500/20">🚪 Logout Session</button>
+
+        <div class="p-4 border-t border-slate-800">
+            <button onclick="handleLogout()" class="w-full flex items-center gap-3 px-4 py-3 text-xs font-bold text-rose-400 hover:bg-rose-500/10 rounded-xl transition-all">
+                <span class="text-lg">🚪</span> Logout Session
+            </button>
+        </div>
     </aside>
 
-    <main class="dashboard-container">
-        <header class="flex justify-between items-center mb-10">
+    <main class="flex-1 flex flex-col relative overflow-hidden bg-slate-900">
+        
+        <header class="h-20 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 flex justify-between items-center px-8 sticky top-0 z-10">
             <div>
-                <h2 class="text-3xl font-extrabold tracking-tight">Credit Portfolio</h2>
-                <p class="text-slate-400 text-sm mt-1">Authorize disbursements and monitor risk exposure.</p>
+                <h2 class="text-xl font-bold text-white">Credit Portfolio</h2>
+                <p class="text-xs text-slate-400">Track, Approve, and Audit Loans</p>
             </div>
-            <button onclick="loadLoans()" class="bg-indigo-600/10 text-indigo-400 text-[10px] font-bold px-4 py-2 rounded-xl border border-indigo-600/20">FORCE REFRESH</button>
+            
+            <div class="relative w-96 group">
+                <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Search members, phone, or loan ID..." 
+                    class="w-full bg-slate-800 border border-slate-700 text-xs font-bold text-white px-4 py-3 pl-10 rounded-xl outline-none focus:border-indigo-500 focus:bg-slate-800 transition-all placeholder:text-slate-500">
+                <span class="absolute left-3 top-3 text-slate-500 group-focus-within:text-indigo-500 transition-colors">🔍</span>
+            </div>
         </header>
 
-        <div class="bg-slate-900/50 border border-slate-800 rounded-[32px] overflow-hidden shadow-2xl">
-            <table class="w-full text-left">
-                <thead class="bg-slate-900 border-b border-slate-800">
-                    <tr>
-                        <th class="p-6 text-[10px] font-bold text-slate-500 uppercase">Applicant</th>
-                        <th class="p-6 text-[10px] font-bold text-slate-500 uppercase">Request Details</th>
-                        <th class="p-6 text-[10px] font-bold text-slate-500 uppercase">Risk Status</th>
-                        <th class="p-6 text-[10px] font-bold text-slate-500 uppercase text-right">Intervention</th>
-                    </tr>
-                </thead>
-                <tbody id="loansBody"></tbody>
-            </table>
+        <div class="px-8 pt-8 pb-4">
+            <div class="flex gap-1 p-1 bg-slate-800 rounded-xl w-fit border border-slate-700/50">
+                <button onclick="switchTab('all')" class="tab-btn active px-5 py-2 rounded-lg text-[10px] uppercase font-bold tracking-wider transition-all bg-indigo-600 text-white shadow-lg" data-tab="all">All Loans</button>
+                <button onclick="switchTab('pending_approval')" class="tab-btn px-5 py-2 rounded-lg text-[10px] uppercase font-bold tracking-wider text-slate-400 hover:text-white transition-all" data-tab="pending_approval">⏳ Pending</button>
+                <button onclick="switchTab('active')" class="tab-btn px-5 py-2 rounded-lg text-[10px] uppercase font-bold tracking-wider text-slate-400 hover:text-white transition-all" data-tab="active">✅ Active</button>
+                <button onclick="switchTab('overdue')" class="tab-btn px-5 py-2 rounded-lg text-[10px] uppercase font-bold tracking-wider text-slate-400 hover:text-white transition-all" data-tab="overdue">⚠️ Overdue</button>
+                <button onclick="switchTab('cleared')" class="tab-btn px-5 py-2 rounded-lg text-[10px] uppercase font-bold tracking-wider text-slate-400 hover:text-white transition-all" data-tab="cleared">🎉 Cleared</button>
+            </div>
         </div>
+
+        <div class="flex-1 overflow-y-auto px-8 pb-10 scrollbar-hide">
+            <div class="border border-slate-700 rounded-2xl overflow-hidden bg-slate-800/20 backdrop-blur-sm">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-slate-800/80 text-slate-400 text-[10px] uppercase font-bold tracking-widest sticky top-0 z-10 backdrop-blur-md">
+                        <tr>
+                            <th class="p-5 border-b border-slate-700">Applicant</th>
+                            <th class="p-5 border-b border-slate-700">Financials</th>
+                            <th class="p-5 border-b border-slate-700">Purpose</th>
+                            <th class="p-5 border-b border-slate-700">Timeline</th>
+                            <th class="p-5 border-b border-slate-700">Risk Status</th>
+                            <th class="p-5 border-b border-slate-700 text-right">Intervention</th>
+                        </tr>
+                    </thead>
+                    <tbody id="loansTableBody" class="text-sm font-medium text-slate-300 divide-y divide-slate-700/50">
+                        </tbody>
+                </table>
+                
+                <div id="emptyState" class="hidden flex flex-col items-center justify-center py-20 opacity-50">
+                    <div class="text-5xl mb-4">📭</div>
+                    <p class="text-slate-400 font-bold">No loans found in this category.</p>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <script>
-        async function loadLoans() {
-            // Fetch loans with user profile data
+        let allLoans = []; // Store fetched loans locally for instant search
+        let currentFilter = 'all';
+
+        // Store the subscription globally so we can manage it
+        let loanSubscription = null;
+
+        async function init() {
+            if (!window.supabaseClient) return;
+            // 1. Initial Load (Get current data)
+            await fetchLoans();
+
+            // 2. SET UP REAL-TIME LISTENER (The New Part)
+            loanSubscription = window.supabaseClient
+                .channel('admin-loans-channel') // Give it a unique name
+                .on(
+                    'postgres_changes', 
+                    { event: '*', schema: 'public', table: 'sacco_loans' }, 
+                    (payload) => {
+                        console.log('Change received!', payload);
+                        // When ANYTHING happens (Insert, Update, Delete)...
+                        // We instantly re-fetch the data to update the UI
+                        fetchLoans();
+                        // Optional: Play a tiny sound or show a toast notification
+                        // alert("Data updated!"); 
+                    }
+                )
+                .subscribe();
+        }
+
+        async function fetchLoans() {
+            const tbody = document.getElementById('loansTableBody');
+            tbody.innerHTML = '<tr><td colspan="6" class="p-12 text-center text-slate-500 animate-pulse font-mono text-xs">SYNCING DATABASE...</td></tr>';
+
+            // Fetch with Profile Data
             const { data, error } = await window.supabaseClient
                 .from('sacco_loans')
-                .select('*, profiles(full_name, phone_number)')
+                .select('*, status, loan_status, profiles(full_name, phone_number, avatar_url)')
                 .order('created_at', { ascending: false });
 
-            if (error) return console.error("Loan Error:", error.message);
-
-            const body = document.getElementById('loansBody');
-            
-            if (data.length === 0) {
-                body.innerHTML = '<tr><td colspan="4" class="p-20 text-center text-slate-500 font-bold uppercase tracking-widest">No Active Applications</td></tr>';
-                return;
+            if (error) {
+                console.error(error);
+                return alert("Error loading loans");
             }
 
-            body.innerHTML = data.map(loan => `
-                <tr class="border-b border-slate-800/50 hover:bg-white/5 transition-all">
-                    <td class="p-6">
-                        <p class="font-bold text-slate-100">${loan.profiles?.full_name || 'Unknown'}</p>
-                        <p class="text-[10px] text-slate-500 font-mono tracking-wider">${loan.mpesa_number}</p>
+            allLoans = data;
+            renderTable();
+        }
+
+        function renderTable() {
+            const tbody = document.getElementById('loansTableBody');
+            const emptyState = document.getElementById('emptyState');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+
+            // 1. Apply Filter (Tab) & Search
+            const filtered = allLoans.filter(loan => {
+                const matchesTab = currentFilter === 'all' || loan.loan_status === currentFilter;
+                const matchesSearch = 
+                    (loan.profiles?.full_name || '').toLowerCase().includes(search) ||
+                    (loan.mpesa_number || '').includes(search) ||
+                    loan.amount.toString().includes(search);
+                
+                return matchesTab && matchesSearch;
+            });
+
+            tbody.innerHTML = '';
+
+            if (filtered.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            }
+            emptyState.classList.add('hidden');
+
+            // 2. Build Rows
+            filtered.forEach(loan => {
+                const row = document.createElement('tr');
+                row.className = "hover:bg-slate-700/30 transition-colors group";
+                
+                // Status Badge Logic
+                let badgeClass = "bg-slate-700 text-slate-300";
+                let badgeLabel = "Unknown";
+                const status = loan.status || loan.loan_status;
+                if (status === 'active') {
+                    badgeClass = "bg-indigo-500/10 text-indigo-400 border border-indigo-500/30";
+                    badgeLabel = "Approved";
+                }
+                if (status === 'pending_approval' || status === 'pending') {
+                    badgeClass = "bg-amber-500/10 text-amber-500 border border-amber-500/30";
+                    badgeLabel = "Pending";
+                }
+                if (status === 'cleared') {
+                    badgeClass = "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30";
+                    badgeLabel = "Cleared";
+                }
+                if (status === 'rejected') {
+                    badgeClass = "bg-rose-500/10 text-rose-500 border border-rose-500/30";
+                    badgeLabel = "Rejected";
+                }
+
+                // Action Buttons Logic
+                let actions = `<span class="text-[10px] text-slate-600 font-bold uppercase tracking-widest">Read Only</span>`;
+                
+                if (loan.loan_status === 'pending_approval' || loan.loan_status === 'pending') {
+                    actions = `
+                        <div class="flex justify-end gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
+                            <button onclick="approveLoan('${loan.id}', ${loan.amount}, '${loan.user_id}', '${loan.profiles?.full_name}', '${loan.mpesa_number}')" 
+                                class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 py-1.5 rounded-lg shadow-lg text-xs font-bold" title="Approve">
+                                Approve
+                            </button>
+                            <button onclick="rejectLoan('${loan.id}', '${loan.user_id}')" 
+                                class="bg-rose-900/50 border border-rose-500/30 text-rose-400 hover:bg-rose-900 hover:text-white px-3 py-1.5 rounded-lg shadow-lg text-xs font-bold" title="Reject">
+                                Reject
+                            </button>
+                        </div>
+                    `;
+                } else if (loan.loan_status === 'active') {
+                    actions = `<button class="text-[10px] font-bold text-indigo-400 border border-indigo-500/30 px-3 py-1.5 rounded-lg hover:bg-indigo-500/10">View Schedule</button>`;
+                }
+
+                row.innerHTML = `
+                    <td class="p-5">
+                        <div class="flex items-center gap-4">
+                            <div class="h-10 w-10 bg-slate-700 rounded-full flex items-center justify-center text-sm font-bold text-slate-300 ring-2 ring-slate-800">
+                                ${loan.profiles?.full_name?.charAt(0) || '?'}
+                            </div>
+                            <div>
+                                <p class="font-bold text-white text-sm">${loan.profiles?.full_name || 'Unknown'}</p>
+                                <p class="text-[11px] text-slate-500 font-mono tracking-wide">${loan.mpesa_number || 'No Phone'}</p>
+                            </div>
+                        </div>
                     </td>
-                    <td class="p-6">
-                        <p class="text-sm font-extrabold text-white">KES ${loan.amount.toLocaleString()}</p>
-                        <p class="text-[10px] text-indigo-400 font-bold">Payback: KES ${loan.total_repayment.toLocaleString()}</p>
+                    <td class="p-5">
+                        <p class="font-extrabold text-white text-sm">KES ${loan.amount.toLocaleString()}</p>
+                        <p class="text-[11px] text-slate-500">To Repay: <span class="text-slate-400">${(loan.total_repayment || 0).toLocaleString()}</span></p>
                     </td>
-                    <td class="p-6">
-                        <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider ${getStatusColor(loan.loan_status)}">
-                            ${loan.loan_status}
+                    <td class="p-5">
+                        <span class="text-[10px] font-bold text-slate-400 bg-slate-800 px-2 py-1 rounded border border-slate-700/50">
+                            ${loan.loan_reason || 'Personal'}
                         </span>
                     </td>
-                    <td class="p-6 text-right space-x-2">
-                        ${loan.loan_status === 'pending' ? 
-                            // BUG FIX: Passing 'loan.user_id' specifically ensures the transaction belongs to the MEMBER, not the ADMIN
-                            `<button onclick="disburseLoan('${loan.id}', '${loan.user_id}', ${loan.amount}, '${loan.profiles?.full_name}')" class="text-[9px] font-black px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 shadow-lg shadow-emerald-900/20">DISBURSE FUNDS</button>
-                             <button onclick="rejectLoan('${loan.id}')" class="text-[9px] font-black px-4 py-2 bg-rose-900/30 text-rose-500 border border-rose-500/30 rounded-lg hover:bg-rose-900/50">REJECT</button>` 
-                            : ''}
-                        ${loan.loan_status === 'active' ? '<span class="text-[10px] font-bold text-slate-600 uppercase">Monitoring</span>' : ''}
+                    <td class="p-5 text-xs text-slate-400">
+                        ${new Date(loan.created_at).toLocaleDateString()}
                     </td>
-                </tr>
-            `).join('');
+                    <td class="p-5">
+                        <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest ${badgeClass}">
+                            ${badgeLabel}
+                        </span>
+                    </td>
+                    <td class="p-5 text-right">
+                        ${actions}
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
         }
 
-        function getStatusColor(status) {
-            if (status === 'active') return 'bg-indigo-500/10 text-indigo-400';
-            if (status === 'pending') return 'bg-amber-500/10 text-amber-500';
-            if (status === 'rejected') return 'bg-rose-500/10 text-rose-500';
-            if (status === 'cleared') return 'bg-emerald-500/10 text-emerald-500';
-            return 'bg-slate-500/10 text-slate-500';
+        // --- FILTER LOGIC ---
+        function switchTab(tab) {
+            currentFilter = tab;
+            // Update UI buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                if (btn.dataset.tab === tab) {
+                    btn.classList.add('bg-indigo-600', 'text-white', 'shadow-lg');
+                    btn.classList.remove('text-slate-400');
+                } else {
+                    btn.classList.remove('bg-indigo-600', 'text-white', 'shadow-lg');
+                    btn.classList.add('text-slate-400');
+                }
+            });
+            renderTable();
         }
 
-        // Updated Function: Accepts applicantId to fix identity bug
-        async function disburseLoan(loanId, applicantId, amount, name) {
-            if (!confirm(`AUTHORIZE DISBURSEMENT: Send KES ${amount} to ${name}?`)) return;
+        function filterTable() { renderTable(); }
 
-            // 1. Update Loan Status
-            const { error: loanError } = await window.supabaseClient
+        // --- ACTIONS (WITH AUDIT) ---
+        async function approveLoan(loanId, amount, userId, name, phone) {
+            if (!confirm("Confirm approval? Funds will be sent immediately.")) return;
+
+            // 1. Show loading state
+            const btn = document.querySelector(`button[onclick="approveLoan('${loanId}')"]`);
+            if(btn) { btn.innerText = "Processing..."; btn.disabled = true; }
+
+            // 2. Call the Database
+            const { data, error } = await window.supabaseClient.rpc('approve_loan', {
+                p_loan_id: loanId
+            });
+
+            if (error) {
+                alert("Error: " + error.message);
+                if(btn) { btn.innerText = "Approve"; btn.disabled = false; }
+            } else {
+                // 3. SUCCESS! 
+                alert("✅ Loan Approved!");
+                // 4. REFRESH THE TABLE (This is the missing piece)
+                // This removes the loan from the list instantly
+                await fetchLoans(); 
+            }
+        }
+
+        async function rejectLoan(loanId, userId) {
+            const reason = prompt("Enter rejection reason (Required):");
+            if (!reason) return;
+
+            const { data: { user } } = await window.supabaseClient.auth.getUser();
+
+            // 1. Update Loan
+            const { error } = await window.supabaseClient
                 .from('sacco_loans')
                 .update({ 
-                    loan_status: 'active',
-                    disbursed_at: new Date().toISOString(),
-                    due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+                    loan_status: 'rejected',
+                    rejection_reason: reason,
+                    rejected_by: user.id
                 })
                 .eq('id', loanId);
 
-            if (loanError) {
-                alert("Disbursement Failed: " + loanError.message);
-                return;
-            }
+            if (error) return alert("Error: " + error.message);
 
-            // 2. Create Ledger Entry using APPLICANT ID
-            await window.supabaseClient
-                .from('transactions')
-                .insert([{
-                    user_id: applicantId, // <--- This ensures Ronny gets the debit, not you.
-                    amount: -amount,
-                    transaction_type: 'loan_disbursement',
-                    description: `Loan Disbursement to ${name}`,
-                    mpesa_reference: 'L-DISB-' + Math.random().toString(36).substr(2, 8).toUpperCase()
-                }]);
+            // 2. Log Audit
+            await window.supabaseClient.from('audit_logs').insert({
+                admin_id: user.id,
+                action_type: 'LOAN_REJECT',
+                target_id: loanId,
+                details: `Rejected. Reason: ${reason}`
+            });
 
-            alert("FUNDS DISBURSED: Loan is now Active.");
-            loadLoans();
-        }
-        
-        async function rejectLoan(loanId) {
-            if(!confirm("Reject this loan application?")) return;
-            await window.supabaseClient.from('sacco_loans').update({ loan_status: 'rejected' }).eq('id', loanId);
-            loadLoans();
+            alert("Loan Rejected.");
+            fetchLoans();
         }
 
         async function handleLogout() {
@@ -153,7 +329,7 @@
             window.location.href = "login.html";
         }
 
-        loadLoans();
+        init();
     </script>
 </body>
 </html>
